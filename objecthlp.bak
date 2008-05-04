@@ -1,0 +1,24 @@
+; objecthlp.scm
+; Desc: procedures to ease the use of objects
+;=================================================
+
+;============================================
+; Procedure param
+; Spec: ( list<sobj> number symbol -> sobj )
+; Desc: Gets the correct param from a list of params
+;       Provides detailed error message
+;============================================
+(define (param prms n sender)
+  (define (print-arguments)
+    (define (print-actual-arguments iprms)
+      (if (not (null? iprms))
+          (begin
+            (display " ")
+            (display (car iprms)))))
+    (display "arguments passed:")
+    (print-actual-arguments))
+  (define (find-nth iprms i)
+    (cond ((null? iprms) (print-arguments)
+                         (error sender "not enough arguments (given ~S)" (- n i)))
+          ((= i 1) (car iprms))
+          (else (find-nth (cdr iprms) (- i 1)))))

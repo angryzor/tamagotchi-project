@@ -1,0 +1,5 @@
+; globloader.scm
+;=================
+; Desc: Loads all global resources.
+
+(load "error.scm")

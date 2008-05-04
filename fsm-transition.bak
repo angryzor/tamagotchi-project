@@ -1,0 +1,17 @@
+; fsm-transition ( (  -> boolean ) fsm-state-object )
+
+(define (fsm-transition condition target)
+
+;=========================================================
+; Method check
+; Spec: (  -> fsm-state-object U { #f } )
+; Desc: Call this procedure on every state-change check.
+;       It will return the state object specified in target when the condition is met, and #f if it is not.
+;=========================================================
+  (define (check)
+    (if (condition)
+        target
+        #f))
+  
+  (define (fsm-transition-object msg)
+    
