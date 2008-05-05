@@ -1,0 +1,3 @@
+(load "double-linked-position-list.scm")
+
+(define (
