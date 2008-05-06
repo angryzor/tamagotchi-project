@@ -17,14 +17,14 @@
 ;*************************************************************
 
 (define (fsm-transition condition target . trans-action)
-
-;=========================================================
-; Method check
-; Spec: (  -> fsm-state-object U { #f } )
-; Desc: Call this procedure on every state-change check.
-;       It will return the state object specified in target when the condition is met, and #f if it is not.
-; Args: /
-;=========================================================
+  
+  ;=========================================================
+  ; Method check
+  ; Spec: (  -> fsm-state-object U { #f } )
+  ; Desc: Call this procedure on every state-change check.
+  ;       It will return the state object specified in target when the condition is met, and #f if it is not.
+  ; Args: /
+  ;=========================================================
   (define (check)
     (if (condition)
         target
@@ -36,8 +36,8 @@
         ((car trans-action))))
   
   (define (fsm-transition-object msg . args)
-      (case msg
-        ('check (check))
-        ('act (act))
-        (else (error 'fsm-transition-object "message \"~S\" unknown" msg))))
+    (case msg
+      ('check (check))
+      ('act (act))
+      (else (error 'fsm-transition-object "message \"~S\" unknown" msg))))
   fsm-transition-object)
