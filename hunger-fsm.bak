@@ -1,0 +1,17 @@
+; fsm.scm
+; Desc: Defines the object fsm.
+;       To use the Finite State Machine ADT, include this file.
+;       This 
+;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+(load "fsm.scm")
+
+;***************************************************
+; Object hunger-fsm
+; Constructor spec: (  -> honger-fsm )
+; Desc: FSM class; represents a Finite State Machine
+; Args: starting-hunger - the starting that the fsm is in
+;***************************************************
+
+(define (hunger-fsm starting-hunger)
+  
