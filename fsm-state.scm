@@ -24,9 +24,9 @@
   ; Desc: adds a new transition to the state
   ; Args: trans - the transition to be added
   ;=================================================
-  (define (add-transition trans)
+  (define (add-transition! trans)
     (if (trans-list 'full?)
-        (error 'fsm-state.add-transition "transition list is full. check your fsm-state size")
+        (error 'fsm-state.add-transition! "transition list is full. check your fsm-state size")
         (trans-list 'add-after! trans)))
   
   ;=================================================
@@ -101,5 +101,5 @@
 (define u (fsm-transition (λ () true) s))
 (define false #f)
 (define true #t)
-(s 'add-transition t)
-(s 'add-transition u)
+(s 'add-transition! t)
+(s 'add-transition! u)

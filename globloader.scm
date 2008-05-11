@@ -5,3 +5,4 @@
 ;Uncomment when uploading to LPCH2214
 ;(load "error.scm")
 (load "objecthlp.scm")
+(load "globalhelpers.scm")
