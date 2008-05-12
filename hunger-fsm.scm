@@ -113,7 +113,10 @@
   (define (hunger-fsm-object msg . args)
     (let ((my-param (make-param 'hunger-fsm-object)))
       (case msg
-        ('transition (transition))
-        ('get-current-state state)
+        ('hungry? (eq? (fsm 'get-current-state) state-hungry))
+        ('satisfied? (eq? (fsm 'get-current-state) state-satisfied))
+        ('eating? (eq? (fsm 'get-current-state) state-eating))
+        ('refused? (eq? (fsm 'get-current-state) state-refused))
+        ('dead? (eq? (fsm 'get-current-state) state-dead))
         (else (apply my-fsm msg args)))))
   hunger-fsm-object)
