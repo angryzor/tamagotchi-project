@@ -1,0 +1,14 @@
+; mood-fsm.scm
+; Desc: Defines the object mood-fsm.
+;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+(load "fsm.scm")
+
+;***************************************************
+; Object mood-fsm
+; Constructor spec: (  -> honger-fsm )
+; Desc: FSM specification for mood
+; Args: /
+;***************************************************
+
+(define (mood-fsm)

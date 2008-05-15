@@ -1,18 +1,18 @@
-; hunger-fsm.scm
-; Desc: Defines the object hunger-fsm.
+; docility-fsm.scm
+; Desc: Defines the object docility-fsm.
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
 
 ;***************************************************
-; Object hunger-fsm
-; Constructor spec: (  -> honger-fsm )
+; Object docility-fsm
+; Constructor spec: (  -> docility-fsm )
 ; Desc: FSM specification to hunger 
 ; Args: /
 ;***************************************************
 
-(define (hunger-fsm)
-  (define hunger-level (need-level))
+(define (docility-fsm)
+  (define rebelliosity-level (need-level))
   (define food-offered #f)
   
   ;===================================================
