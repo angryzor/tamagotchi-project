@@ -3,6 +3,7 @@
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
+(load "need-level.scm")
 
 ;***************************************************
 ; Object hunger-fsm
@@ -51,6 +52,8 @@
   ;===================================================
   (define (init-transitions)
     (state-satisfied 'add-transition! (fsm-transition (λ () (hunger-level 'high?)) state-hungry))
+    (state-satisfied 'add-transition! (fsm-transition (λ () (and food-offered (not (rebels?)))) state-eating))
+    (state-satisfied 'add-transition! (fsm-transition (λ () (and food-offered (rebels?))) state-refused))
     (state-satisfied 'add-transition! (fsm-transition true-condition? state-satisfied))
     ;;---
     (state-hungry 'add-transition! (fsm-transition (λ () (and food-offered (not (rebels?)))) state-eating))
@@ -64,23 +67,24 @@
     (state-refused 'add-transition! (fsm-transition true-condition? state-hungry)))
 
     
-  (define state-satisfied (fsm-state (λ () (hunger-level 'raise!)) '() 2))
+  (define state-satisfied (fsm-state (λ () (hunger-level 'raise!)) '() 4))
   (define state-hungry (fsm-state (λ () (hunger-level 'raise!)) '() 5))
   (define state-eating (fsm-state eat-the-food! '() 1))
   (define state-refused (fsm-state reject-the-food! '() 1))
   (define state-dead (fsm-state '() '() 0))
-  
-  (init-transitions)
   
   (define my-fsm (fsm state-satisfied))
   
   (define (hunger-fsm-object msg . args)
     (let ((my-param (make-param 'hunger-fsm-object)))
       (case msg
-        ('hungry? (eq? (fsm 'get-current-state) state-hungry))
-        ('satisfied? (eq? (fsm 'get-current-state) state-satisfied))
-        ('eating? (eq? (fsm 'get-current-state) state-eating))
-        ('refused? (eq? (fsm 'get-current-state) state-refused))
-        ('dead? (eq? (fsm 'get-current-state) state-dead))
+        ('hungry? (eq? (my-fsm 'get-current-state) state-hungry))
+        ('satisfied? (eq? (my-fsm 'get-current-state) state-satisfied))
+        ('eating? (eq? (my-fsm 'get-current-state) state-eating))
+        ('refused? (eq? (my-fsm 'get-current-state) state-refused))
+        ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         (else (apply my-fsm msg args)))))
+  
+  (init-transitions)
+
   hunger-fsm-object)

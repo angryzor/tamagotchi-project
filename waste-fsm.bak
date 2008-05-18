@@ -1,0 +1,86 @@
+; waste-fsm.scm
+; Desc: Defines the object sleep-fsm.
+;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+(load "fsm.scm")
+
+;***************************************************
+; Object waste-fsm
+; Constructor spec: (  -> waste-fsm )
+; Desc: FSM specification to waste
+; Args: /
+;***************************************************
+
+(define (waste-fsm)
+  (define waste-level (need-level))
+  (define clean-waste #f)
+  
+  ;===================================================
+  ; Method waste
+  ; Spec: (  -> { #<void> } )
+  ; Desc: set put-in-bed to #f and calls lower-waste-level!
+  ; Args: /
+  ;===================================================
+  (define (waste)
+    (set! put-in-bed #f)
+    (waste-level 'lower!))
+
+  ;===================================================
+  ; Method dont-waste
+  ; Spec: (  -> { #<void> } )
+  ; Desc: set put-in-bed to #f and calls lower-waste-level!
+  ; Args: /
+  ;===================================================
+  (define (dont-waste)
+    (set! put-in-bed #f))
+
+  ;===================================================
+  ; Method true-condition?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: always returns true
+  ; Args: /
+  ;===================================================
+  (define (true-condition?)
+    #t)
+
+  ;===================================================
+  ; Method init-transitions
+  ; Spec: (  -> { #<void> } )
+  ; Desc: adds transitions to all states (must be called after the states are created)
+  ; Args: /
+  ;===================================================
+  (define (init-transitions)
+    (state-wastey 'add-transition! (fsm-transition (λ () (waste-level 'high?)) state-sick))
+    (state-wastey 'add-transition! (fsm-transition true-condition? state-awake))
+    ;;---
+    (state-sick 'add-transition! (fsm-transition (λ () put-in-bed) state-awaste))
+    (state-sick 'add-transition! (fsm-transition (λ () (and play-game (rebels?))) state-refused))
+    (state-sick 'add-transition! (fsm-transition (λ () (waste-level 'low?)) state-awake))
+    (state-sick 'add-transition! (fsm-transition (λ () (waste-level 'deadly?)) state-dead))
+    (state-sick 'add-transition! (fsm-transition true-condition? state-sick))
+    ;;---
+    (state-healing 'add-transition! (fsm-transition true-condition? state-sick)))
+    ;;---
+    (state-refused 'add-transition! (fsm-transition true-condition? state-sick)))
+
+
+  (define state-wastey (fsm-state (λ () (waste-level 'raise!)) '() 2))
+  (define state-sick (fsm-state (λ () (waste-level 'raise!)) '() 5))
+  (define state-healing (fsm-state waste '() 1))
+  (define state-refused (fsm-state reject-a-game '() 1))
+  (define state-dead (fsm-state '() '() 0))
+  
+  (init-transitions)
+  
+  (define my-fsm (fsm state-awake))
+  
+  (define (waste-fsm-object msg . args)
+    (let ((my-param (make-param 'waste-fsm-object)))
+      (case msg
+        ('sick? (eq? (my-fsm 'get-current-state) state-sick))
+        ('awake? (eq? (my-fsm 'get-current-state) state-awake))
+        ('getting-medication? (eq? (my-fsm 'get-current-state) state-getting-medication))
+        ('refused? (eq? (my-fsm 'get-current-state) state-refused))
+        ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        (else (apply my-fsm msg args)))))
+  waste-fsm-object)

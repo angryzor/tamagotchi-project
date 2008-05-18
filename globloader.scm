@@ -6,3 +6,4 @@
 ;(load "error.scm")
 (load "objecthlp.scm")
 (load "globalhelpers.scm")
+(load "settings.scm")

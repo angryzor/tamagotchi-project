@@ -1,0 +1,87 @@
+; health-fsm.scm
+; Desc: Defines the object sleep-fsm.
+;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+(load "fsm.scm")
+
+;***************************************************
+; Object health-fsm
+; Constructor spec: (  -> health-fsm )
+; Desc: FSM specification to health
+; Args: /
+;***************************************************
+
+(define (health-fsm)
+  (define tiredness-level (need-level))
+  (define put-in-bed #f)
+  
+  ;===================================================
+  ; Method health
+  ; Spec: (  -> { #<void> } )
+  ; Desc: set put-in-bed to #f and calls lower-tiredness-level!
+  ; Args: /
+  ;===================================================
+  (define (health)
+    (wait health_TIME_SECONDS)
+    (set! put-in-bed #f)
+    (tiredness-level 'lower!))
+
+  ;===================================================
+  ; Method dont-health
+  ; Spec: (  -> { #<void> } )
+  ; Desc: set put-in-bed to #f and calls lower-tiredness-level!
+  ; Args: /
+  ;===================================================
+  (define (dont-health)
+    (set! put-in-bed #f))
+
+  ;===================================================
+  ; Method true-condition?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: always returns true
+  ; Args: /
+  ;===================================================
+  (define (true-condition?)
+    #t)
+
+  ;===================================================
+  ; Method init-transitions
+  ; Spec: (  -> { #<void> } )
+  ; Desc: adds transitions to all states (must be called after the states are created)
+  ; Args: /
+  ;===================================================
+  (define (init-transitions)
+    (state-awake 'add-transition! (fsm-transition (λ () (tiredness-level 'high?)) state-tired))
+    (state-awake 'add-transition! (fsm-transition true-condition? state-awake))
+    ;;---
+    (state-tired 'add-transition! (fsm-transition (λ () put-in-bed) state-ahealth))
+    (state-tired 'add-transition! (fsm-transition (λ () (and play-game (rebels?))) state-refused))
+    (state-tired 'add-transition! (fsm-transition (λ () (tiredness-level 'low?)) state-awake))
+    (state-tired 'add-transition! (fsm-transition (λ () (tiredness-level 'deadly?)) state-dead))
+    (state-tired 'add-transition! (fsm-transition true-condition? state-tired))
+    ;;---
+    (state-ahealth 'add-transition! (fsm-transition true-condition? state-tired)))
+    ;;---
+    (state-refused 'add-transition! (fsm-transition true-condition? state-tired)))
+
+
+  (define state-awake (fsm-state (λ () (tiredness-level 'raise!)) '() 2))
+  (define state-tired (fsm-state (λ () (tiredness-level 'raise!)) '() 5))
+  (define state-healthing (fsm-state health '() 1))
+  (define state-refused (fsm-state reject-a-game '() 1))
+  (define state-dead (fsm-state '() '() 0))
+  
+  (init-transitions)
+  
+  (define my-fsm (fsm state-awake))
+  
+  (define (health-fsm-object msg . args)
+    (let ((my-param (make-param 'health-fsm-object)))
+      (case msg
+        ('tired? (eq? (my-fsm 'get-current-state) state-tired))
+        ('awake? (eq? (my-fsm 'get-current-state) state-awake))
+        ('healthing? (eq? (my-fsm 'get-current-state) state-healthing))
+        ('refused? (eq? (my-fsm 'get-current-state) state-refused))
+        ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        (else (apply my-fsm msg args)))))
+  health-fsm-object)

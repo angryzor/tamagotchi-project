@@ -3,7 +3,7 @@
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
-(load "need-level.scm")
+(define SLEEP_TIME_SECONDS 30)
 
 ;***************************************************
 ; Object docility-fsm
@@ -12,19 +12,20 @@
 ; Args: /
 ;***************************************************
 
-(define (docility-fsm)
-  (define rebelliosity-level (need-level))
-  (define punishment-given #f)
+(define (sleep-fsm)
+  (define tiredness-level (need-level))
+  (define put-in-bed #f)
   
   ;===================================================
-  ; Method receive-punishment
+  ; Method eat-the-food!
   ; Spec: (  -> { #<void> } )
   ; Desc: set punishment-given to #f and calls lower-rebelliosity-level!
   ; Args: /
   ;===================================================
   (define (sleep)
-    (set! punishment-given #f)
-    (rebelliosity-level 'lower!))
+    (wait SLEEP_TIME_SECONDS)
+    (set! put-in-bed #f)
+    (tiredness-level 'lower!))
 
   ;===================================================
   ; Method true-condition?
@@ -49,12 +50,14 @@
     (state-rebellish 'add-transition! (fsm-transition (λ () (rebelliosity-level 'low?)) state-docile))
     (state-rebellish 'add-transition! (fsm-transition true-condition? state-rebellish))
     ;;---
-    (state-getting-punished 'add-transition! (fsm-transition true-condition? state-rebellish)))
+    (state-asleep 'add-transition! (fsm-transition true-condition? state-rebellish)))
 
 
   (define state-docile (fsm-state (λ () (rebelliosity-level 'raise!)) '() 2))
   (define state-rebellish (fsm-state (λ () (rebelliosity-level 'raise!)) '() 3))
   (define state-getting-punished (fsm-state receive-punishment '() 1))
+  
+  (init-transitions)
   
   (define my-fsm (fsm state-docile))
   
@@ -64,9 +67,5 @@
         ('rebellish? (eq? (my-fsm 'get-current-state) state-rebellish))
         ('docile? (eq? (my-fsm 'get-current-state) state-docile))
         ('getting-punished? (eq? (my-fsm 'get-current-state) state-getting-punished))
-        ('dead? #f)
         (else (apply my-fsm msg args)))))
-  
-  (init-transitions)
-
   docility-fsm-object)

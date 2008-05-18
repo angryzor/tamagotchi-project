@@ -3,6 +3,7 @@
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
+(load "need-level.scm")
 
 ;***************************************************
 ; Object mood-fsm
@@ -51,6 +52,8 @@
   ;===================================================
   (define (init-transitions)
     (state-happy 'add-transition! (fsm-transition (λ () (unhappiness-level 'high?)) state-unhappy))
+    (state-happy 'add-transition! (fsm-transition (λ () (and play-game (not (rebels?)))) state-playing-game))
+    (state-happy 'add-transition! (fsm-transition (λ () (and play-game (rebels?))) state-refused))
     (state-happy 'add-transition! (fsm-transition true-condition? state-happy))
     ;;---
     (state-unhappy 'add-transition! (fsm-transition (λ () (and play-game (not (rebels?)))) state-playing-game))
@@ -63,23 +66,24 @@
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-unhappy)))
 
-  (define state-happy (fsm-state raise-unhappiness-level! '() 2))
+  (define state-happy (fsm-state raise-unhappiness-level! '() 4))
   (define state-unhappy (fsm-state raise-unhappiness-level! '() 5))
   (define state-playing-game (fsm-state eat-the-food! '() 1))
   (define state-refused (fsm-state reject-a-game '() 1))
   (define state-dead (fsm-state '() '() 0))    ; suicide? :S
-
-  (init-transitions)
   
   (define my-fsm (fsm state-satisfied))
   
   (define (mood-fsm-object msg . args)
     (let ((my-param (make-param 'mood-fsm-object)))
       (case msg
-        ('unhappy? (eq? (fsm 'get-current-state) state-unhappy))
-        ('happy? (eq? (fsm 'get-current-state) state-happy))
-        ('playing-game? (eq? (fsm 'get-current-state) state-playing-game))
-        ('refused? (eq? (fsm 'get-current-state) state-refused))
-        ('dead? (eq? (fsm 'get-current-state) state-dead))
+        ('unhappy? (eq? (my-fsm 'get-current-state) state-unhappy))
+        ('happy? (eq? (my-fsm 'get-current-state) state-happy))
+        ('playing-game? (eq? (my-fsm 'get-current-state) state-playing-game))
+        ('refused? (eq? (my-fsm 'get-current-state) state-refused))
+        ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         (else (apply my-fsm msg args)))))
+
+  (init-transitions)
+
   mood-fsm-object)
