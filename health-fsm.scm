@@ -76,7 +76,7 @@
   (define my-fsm (fsm state-awake))
   
   (define (health-fsm-object msg . args)
-    (let ((my-param (make-param 'health-fsm-object)))
+    (let ((my-param (make-param args 'health-fsm-object)))
       (case msg
         ('sick? (eq? (my-fsm 'get-current-state) state-sick))
         ('healthy? (eq? (my-fsm 'get-current-state) state-healthy))

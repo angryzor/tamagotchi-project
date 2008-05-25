@@ -64,7 +64,7 @@
   (define my-fsm (fsm state-awake))
   
   (define (waste-fsm-object msg . args)
-    (let ((my-param (make-param 'waste-fsm-object)))
+    (let ((my-param (make-param args 'waste-fsm-object)))
       (case msg
         ('disgusting? (eq? (my-fsm 'get-current-state) state-disgusting))
         ('clean? (eq? (my-fsm 'get-current-state) state-clean))

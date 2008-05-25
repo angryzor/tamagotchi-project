@@ -6,3 +6,7 @@
   (cond ((< x low) low)
         ((> x high) high)
         (else x)))
+
+(define (safe-optionalbool bl)
+  (and (not (null? bl))
+       bl))

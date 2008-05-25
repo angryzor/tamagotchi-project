@@ -75,7 +75,7 @@
   (define my-fsm (fsm state-satisfied))
   
   (define (mood-fsm-object msg . args)
-    (let ((my-param (make-param 'mood-fsm-object)))
+    (let ((my-param (make-param args 'mood-fsm-object)))
       (case msg
         ('unhappy? (eq? (my-fsm 'get-current-state) state-unhappy))
         ('happy? (eq? (my-fsm 'get-current-state) state-happy))

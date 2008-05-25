@@ -59,7 +59,7 @@
   (define my-fsm (fsm state-docile))
   
   (define (docility-fsm-object msg . args)
-    (let ((my-param (make-param 'docility-fsm-object)))
+    (let ((my-param (make-param args 'docility-fsm-object)))
       (case msg
         ('rebellish? (eq? (my-fsm 'get-current-state) state-rebellish))
         ('docile? (eq? (my-fsm 'get-current-state) state-docile))

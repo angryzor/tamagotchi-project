@@ -1,0 +1,2 @@
+(define (tamagotchi-fsmbundler size)
+  (define 

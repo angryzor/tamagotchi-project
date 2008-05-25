@@ -76,7 +76,7 @@
   (define (fsm-state-object msg . args)
     (let ((my-param (make-param 'fsm-state-object)))
       (case msg
-        ('add-transition (add-transition (my-param args 1)))
+        ('add-transition! (add-transition! (my-param args 1)))
         ('next-state (next-state))
         ('enter (enter))
         ('leave (leave))
@@ -93,13 +93,3 @@
 ;                    if this argument is not set, next-state will return #f in this case,
 ;                    and the fsm should stay in this state
 ;%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-(load "fsm-transition.scm"
-      )
-(define s (fsm-state '() '() 2))
-(define t (fsm-transition (λ () false) s))
-(define u (fsm-transition (λ () true) s))
-(define false #f)
-(define true #t)
-(s 'add-transition! t)
-(s 'add-transition! u)

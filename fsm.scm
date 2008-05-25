@@ -34,7 +34,7 @@
           'ok)))
   
   (define (fsm-object msg . args)
-    (let ((my-param (make-param 'fsm-object)))
+    (let ((my-param (make-param args 'fsm-object)))
       (case msg
         ('transition (transition))
         ('get-current-state state)

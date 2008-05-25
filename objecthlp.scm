@@ -35,6 +35,6 @@
 ;       so this would not have to be repeated numerous times in the object definition
 ; Args: sender - a symbol representation of the object that receives the message
 ;******************************************************
-(define (make-param sender)
-  (λ (prms n)
+(define (make-param prms sender)
+  (lambda (n)
     (param prms n sender)))

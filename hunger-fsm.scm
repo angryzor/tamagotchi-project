@@ -76,7 +76,7 @@
   (define my-fsm (fsm state-satisfied))
   
   (define (hunger-fsm-object msg . args)
-    (let ((my-param (make-param 'hunger-fsm-object)))
+    (let ((my-param (make-param args 'hunger-fsm-object)))
       (case msg
         ('hungry? (eq? (my-fsm 'get-current-state) state-hungry))
         ('satisfied? (eq? (my-fsm 'get-current-state) state-satisfied))

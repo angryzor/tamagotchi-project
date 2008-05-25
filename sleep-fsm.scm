@@ -77,7 +77,7 @@
   (define my-fsm (fsm state-awake))
   
   (define (sleep-fsm-object msg . args)
-    (let ((my-param (make-param 'sleep-fsm-object)))
+    (let ((my-param (make-param args 'sleep-fsm-object)))
       (case msg
         ('tired? (eq? (my-fsm 'get-current-state) state-tired))
         ('awake? (eq? (my-fsm 'get-current-state) state-awake))

@@ -50,43 +50,43 @@
             (vector-set! vect (+ ilen dest) (vector-ref vect (+ ilen src)))
             (iter (- ilen 1)))))
     (iter (- len 1)))
-
+  
   ; Public functions
   
   (define (getnext pos)
     (checkpos pos)
-
+    
     (if (= pos (- ptr 1))
         (error vector-position-list.getnext "position has no next")
         (+ pos 1)))
   
   (define (getprev pos)
     (checkpos pos)
-
+    
     (if (= pos 0)
         (error vector-position-list.getprev "position has no previous")
         (- pos 1)))
   
   (define (getval pos)
     (checkpos pos)
-
+    
     (vector-ref vect pos))
   
   (define (gethas-next? pos)
     (checkpos pos)
-
+    
     (not (= pos (- ptr 1))))
   
   (define (gethas-prev? pos)
     (checkpos pos)
-
+    
     (not (= pos 0)))
   
   (define (update! pos val)
     (checkpos pos)
-
+    
     (vector-set! vect pos val))
-
+  
   (define (from-scheme-list lst)
     (if (not (null? lst))
         (begin (add-after! (car lst))
@@ -131,14 +131,15 @@
     (if (empty?)
         zero
         (iter (last-position) zero)))
+  
   (define (first-position)
     (if (empty?)
-        (error 'vector-position-list "first position requested, but list is empty!")
+        (error 'vector-position-list.first-position "first position requested, but list is empty!")
         0))
   
   (define (last-position)
     (if (empty?)
-        (error 'vector-position-list "last position requested, but list is empty!")
+        (error 'vector-position-list.last-position "last position requested, but list is empty!")
         (- ptr 1)))
   
   (define (find value)
@@ -162,29 +163,35 @@
   (define (delete! pos)
     (checkpos pos)
     (let ((behind (+ pos 1)))
-      (storage-move-left behind (- (length) behind) pos)))
+      (storage-move-left behind (- (length) behind) pos)
+      (set! ptr (- ptr 1))))
   
   (define (add-before! val . pos)
     (let ((realpos (if (null? pos)
-                       (first-position)
+                       (if (empty?)
+                           -1
+                           (first-position))
                        (car pos))))
       (if (full?)
-          (error vector-position-list.add-before! "list is full")
+          (error 'vector-position-list.add-before! "list is full")
           (begin
             (storage-move-right realpos (- (length) realpos) (+ realpos 1))
-            (vector-set! vect realpos val)))))
+            (vector-set! vect realpos val)
+            (set! ptr (+ ptr 1))))))
   
   (define (add-after! val . pos)
     (let* ((realpos (if (null? pos)
-                        (last-position)
-
+                        (if (empty?)
+                            -1
+                            (last-position))
                         (car pos)))
            (behind (+ realpos 1)))
       (if (full?)
-          (error vector-position-list.add-before! "list is full")
+          (error 'vector-position-list.add-after! "list is full")
           (begin
             (storage-move-right behind (- (length) behind) (+ behind 1))
-            (vector-set! vect behind val)))))
+            (vector-set! vect behind val)
+            (set! ptr (+ ptr 1))))))
   
   (define (duplicate)
     (define (iter lst pos)
@@ -203,7 +210,7 @@
       (if (gethas-next? pos)
           (iter (getnext pos))))
     (cond ((empty?) (display "()")
-                         (newline))
+                    (newline))
           (else (display "(")
                 (iter (first-position))
                 (display ")"))))
@@ -217,37 +224,37 @@
         '()
         (rec (first-position))))
   
+  (define (vector-position-list-object msg . args)
+    (let ((my-param (make-param 'vector-position-list)))
+      (case msg
+        ('length (length))
+        ('full? (full?))
+        ('empty? (empty?))
+        ('map (map (my-param args 1) (my-param args 2)))
+        ('map! (map! (my-param args 1) (my-param args 2)))
+        ('foldl (foldl (my-param args 1) (my-param args 2)))
+        ('foldr (foldr (my-param args 1) (my-param args 2)))
+        ('first-position (first-position))
+        ('last-position (last-position))
+        ('find (find (my-param args 1)))
+        ('find-eq (find-eq (my-param args 1)))
+        ('delete! (delete! (my-param args 1)))
+        ('add-before! (apply add-before! (my-param args 1) (cdr args)))
+        ('add-after! (apply add-after! (my-param args 1) (cdr args)))
+        ('next (getnext (my-param args 1)))
+        ('prev (getprev (my-param args 1)))
+        ('value (getval (my-param args 1)))
+        ('update! (update! (my-param args 1) (my-param args 2)))
+        ('has-next? (gethas-next? (my-param args 1)))
+        ('has-prev? (gethas-prev? (my-param args 1)))
+        ('print (debug-print-complete))
+        ('duplicate (duplicate))
+        ('to-scheme-list (to-scheme-list))
+        (else (error 'vector-position-list "message not understood: ~S" msg)))))
+  
   (unless (null? lst)
     (from-scheme-list (car lst)))
   
-  (define (vector-position-list-object . msg)
-    (if (null? msg)
-        (first-position)
-        (case (car msg)
-          ('length (length))
-          ('full? (full?))
-          ('empty? (empty?))
-          ('map (map (GetParam msg 0) (GetParam msg 1)))
-          ('map! (map! (GetParam msg 0) (GetParam msg 1)))
-          ('foldl (foldl (GetParam msg 0) (GetParam msg 1)))
-          ('foldr (foldr (GetParam msg 0) (GetParam msg 1)))
-          ('first-position (first-position))
-          ('last-position (last-position))
-          ('find (find (GetParam msg 0)))
-          ('find-eq (find-eq (GetParam msg 0)))
-          ('delete! (delete! (GetParam msg 0)))
-          ('add-before! (apply add-before! (GetParam msg 0) (cddr msg)))
-          ('add-after! (apply add-after! (GetParam msg 0) (cddr msg)))
-          ('next (getnext (GetParam msg 0)))
-          ('prev (getprev (GetParam msg 0)))
-          ('value (getval (GetParam msg 0)))
-          ('update! (update! (GetParam msg 0) (GetParam msg 1)))
-          ('has-next? (gethas-next? (GetParam msg 0)))
-          ('has-prev? (gethas-prev? (GetParam msg 0)))
-          ('print (debug-print-complete))
-          ('duplicate (duplicate))
-          ('to-scheme-list (to-scheme-list))
-          (else (error 'vector-position-list "message not understood: ~S" (car msg))))))
   vector-position-list-object)
 
 
