@@ -1,0 +1,3 @@
+(load "random-generator.scm")
+
+(define random (random-generator))

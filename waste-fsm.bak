@@ -3,6 +3,7 @@
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
+(load "need-level.scm")
 
 ;***************************************************
 ; Object waste-fsm
@@ -11,28 +12,19 @@
 ; Args: /
 ;***************************************************
 
-(define (waste-fsm)
+(define (waste-fsm external)
   (define waste-level (need-level))
   (define clean-waste #f)
   
   ;===================================================
-  ; Method waste
+  ; Method clean
   ; Spec: (  -> { #<void> } )
-  ; Desc: set put-in-bed to #f and calls lower-waste-level!
+  ; Desc: set clean-waste to #f and calls lower-waste-level!
   ; Args: /
   ;===================================================
-  (define (waste)
-    (set! put-in-bed #f)
+  (define (clean)
+    (set! clean-waste #f)
     (waste-level 'lower!))
-
-  ;===================================================
-  ; Method dont-waste
-  ; Spec: (  -> { #<void> } )
-  ; Desc: set put-in-bed to #f and calls lower-waste-level!
-  ; Args: /
-  ;===================================================
-  (define (dont-waste)
-    (set! put-in-bed #f))
 
   ;===================================================
   ; Method true-condition?
@@ -50,37 +42,37 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-wastey 'add-transition! (fsm-transition (λ () (waste-level 'high?)) state-sick))
-    (state-wastey 'add-transition! (fsm-transition true-condition? state-awake))
+    (state-clean 'add-transition! (fsm-transition (λ () (waste-level 'high?)) state-disgusting))
+    (state-clean 'add-transition! (fsm-transition (λ () clean-waste) state-cleaning))
+    (state-clean 'add-transition! (fsm-transition true-condition? state-clean))
     ;;---
-    (state-sick 'add-transition! (fsm-transition (λ () put-in-bed) state-awaste))
-    (state-sick 'add-transition! (fsm-transition (λ () (and play-game (rebels?))) state-refused))
-    (state-sick 'add-transition! (fsm-transition (λ () (waste-level 'low?)) state-awake))
-    (state-sick 'add-transition! (fsm-transition (λ () (waste-level 'deadly?)) state-dead))
-    (state-sick 'add-transition! (fsm-transition true-condition? state-sick))
+    (state-disgusting 'add-transition! (fsm-transition (λ () clean-waste) state-cleaning))
+    (state-disgusting 'add-transition! (fsm-transition (λ () (waste-level 'low?)) state-clean))
+    (state-disgusting 'add-transition! (fsm-transition (λ () (waste-level 'deadly?)) state-sickening))
+    (state-disgusting 'add-transition! (fsm-transition true-condition? state-disgusting))
     ;;---
-    (state-healing 'add-transition! (fsm-transition true-condition? state-sick)))
+    (state-cleaning 'add-transition! (fsm-transition true-condition? state-disgusting))
     ;;---
-    (state-refused 'add-transition! (fsm-transition true-condition? state-sick)))
+    (state-sickening 'add-transition! (fsm-transition true-condition? state-disgusting)))
 
 
-  (define state-wastey (fsm-state (λ () (waste-level 'raise!)) '() 2))
-  (define state-sick (fsm-state (λ () (waste-level 'raise!)) '() 5))
-  (define state-healing (fsm-state waste '() 1))
-  (define state-refused (fsm-state reject-a-game '() 1))
-  (define state-dead (fsm-state '() '() 0))
-  
-  (init-transitions)
+  (define state-clean (fsm-state (λ () (waste-level 'raise!)) '() 3))
+  (define state-disgusting (fsm-state (λ () (waste-level 'raise!)) '() 4))
+  (define state-cleaning (fsm-state clean '() 1))
+  (define state-sickening (fsm-state (λ () (external 'health 'sicken!)) '() 1))
   
   (define my-fsm (fsm state-awake))
   
   (define (waste-fsm-object msg . args)
-    (let ((my-param (make-param 'waste-fsm-object)))
+    (let ((my-param (make-param args 'waste-fsm-object)))
       (case msg
-        ('sick? (eq? (my-fsm 'get-current-state) state-sick))
-        ('awake? (eq? (my-fsm 'get-current-state) state-awake))
-        ('getting-medication? (eq? (my-fsm 'get-current-state) state-getting-medication))
-        ('refused? (eq? (my-fsm 'get-current-state) state-refused))
-        ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        ('disgusting? (eq? (my-fsm 'get-current-state) state-disgusting))
+        ('clean? (eq? (my-fsm 'get-current-state) state-clean))
+        ('cleaning? (eq? (my-fsm 'get-current-state) state-cleaning))
+        ('sickening (eq? (my-fsm 'get-current-state) state-sickening))
+        ('dead? #f)
         (else (apply my-fsm msg args)))))
+  
+  (init-transitions)
+
   waste-fsm-object)

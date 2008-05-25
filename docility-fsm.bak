@@ -3,36 +3,28 @@
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
+(load "need-level.scm")
 
 ;***************************************************
 ; Object docility-fsm
 ; Constructor spec: (  -> docility-fsm )
-; Desc: FSM specification to hunger 
+; Desc: FSM specification to docility
 ; Args: /
 ;***************************************************
 
 (define (docility-fsm)
-  (define hunger-level (need-level))
-  (define food-offered #f)
+  (define rebelliosity-level (need-level))
+  (define punishment-given #f)
   
   ;===================================================
-  ; Method eat-the-food!
+  ; Method receive-punishment
   ; Spec: (  -> { #<void> } )
-  ; Desc: set food-offered to #f and calls lower-hunger-level!
+  ; Desc: set punishment-given to #f and calls lower-rebelliosity-level!
   ; Args: /
   ;===================================================
-  (define (eat-the-food!)
-    (set! food-offered #f)
-    (hunger-level 'lower!))
-
-  ;===================================================
-  ; Method reject-the-food!
-  ; Spec: (  -> { #<void> } )
-  ; Desc: set food-offered to #f
-  ; Args: /
-  ;===================================================
-  (define (reject-the-food!)
-    (set! food-offered #f))
+  (define (sleep)
+    (set! punishment-given #f)
+    (rebelliosity-level 'lower!))
 
   ;===================================================
   ; Method true-condition?
@@ -50,37 +42,31 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-satisfied 'add-transition! (fsm-transition (λ () (hunger-level 'high?)) state-hungry))
-    (state-satisfied 'add-transition! (fsm-transition true-condition? state-satisfied))
+    (state-docile 'add-transition! (fsm-transition (λ () (rebelliosity-level 'high?)) state-rebellish))
+    (state-docile 'add-transition! (fsm-transition true-condition? state-docile))
     ;;---
-    (state-hungry 'add-transition! (fsm-transition (λ () (and food-offered (not (rebels?)))) state-eating))
-    (state-hungry 'add-transition! (fsm-transition (λ () (and food-offered (rebels?))) state-refused))
-    (state-hungry 'add-transition! (fsm-transition (λ () (hunger-level 'low?)) state-satisfied))
-    (state-hungry 'add-transition! (fsm-transition (λ () (hunger-level 'deadly?)) state-dead))
-    (state-hungry 'add-transition! (fsm-transition true-condition? state-hungry))
+    (state-rebellish 'add-transition! (fsm-transition (λ () punishment-given) state-getting-punished))
+    (state-rebellish 'add-transition! (fsm-transition (λ () (rebelliosity-level 'low?)) state-docile))
+    (state-rebellish 'add-transition! (fsm-transition true-condition? state-rebellish))
     ;;---
-    (state-eating 'add-transition! (fsm-transition true-condition? state-hungry))
-    ;;---
-    (state-refused 'add-transition! (fsm-transition true-condition? state-hungry)))
+    (state-getting-punished 'add-transition! (fsm-transition true-condition? state-rebellish)))
 
-    
-  (define state-satisfied (fsm-state (λ () (hunger-level 'raise!)) '() 2))
-  (define state-hungry (fsm-state (λ () (hunger-level 'raise!)) '() 5))
-  (define state-eating (fsm-state eat-the-food! '() 1))
-  (define state-refused (fsm-state reject-the-food! '() 1))
-  (define state-dead (fsm-state '() '() 0))
+
+  (define state-docile (fsm-state (λ () (rebelliosity-level 'raise!)) '() 2))
+  (define state-rebellish (fsm-state (λ () (rebelliosity-level 'raise!)) '() 3))
+  (define state-getting-punished (fsm-state receive-punishment '() 1))
+  
+  (define my-fsm (fsm state-docile))
+  
+  (define (docility-fsm-object msg . args)
+    (let ((my-param (make-param args 'docility-fsm-object)))
+      (case msg
+        ('rebellish? (eq? (my-fsm 'get-current-state) state-rebellish))
+        ('docile? (eq? (my-fsm 'get-current-state) state-docile))
+        ('getting-punished? (eq? (my-fsm 'get-current-state) state-getting-punished))
+        ('dead? #f)
+        (else (apply my-fsm msg args)))))
   
   (init-transitions)
-  
-  (define my-fsm (fsm state-satisfied))
-  
-  (define (hunger-fsm-object msg . args)
-    (let ((my-param (make-param 'hunger-fsm-object)))
-      (case msg
-        ('hungry? (eq? (fsm 'get-current-state) state-hungry))
-        ('satisfied? (eq? (fsm 'get-current-state) state-satisfied))
-        ('eating? (eq? (fsm 'get-current-state) state-eating))
-        ('refused? (eq? (fsm 'get-current-state) state-refused))
-        ('dead? (eq? (fsm 'get-current-state) state-dead))
-        (else (apply my-fsm msg args)))))
-  hunger-fsm-object)
+
+  docility-fsm-object)

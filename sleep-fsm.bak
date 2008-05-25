@@ -1,14 +1,14 @@
-; docility-fsm.scm
-; Desc: Defines the object docility-fsm.
+; sleep-fsm.scm
+; Desc: Defines the object sleep-fsm.
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
-(define SLEEP_TIME_SECONDS 30)
+(load "need-level.scm")
 
 ;***************************************************
-; Object docility-fsm
-; Constructor spec: (  -> docility-fsm )
-; Desc: FSM specification to docility
+; Object sleep-fsm
+; Constructor spec: (  -> sleep-fsm )
+; Desc: FSM specification to sleep
 ; Args: /
 ;***************************************************
 
@@ -17,15 +17,24 @@
   (define put-in-bed #f)
   
   ;===================================================
-  ; Method eat-the-food!
+  ; Method sleep
   ; Spec: (  -> { #<void> } )
-  ; Desc: set punishment-given to #f and calls lower-rebelliosity-level!
+  ; Desc: set put-in-bed to #f and calls lower-tiredness-level!
   ; Args: /
   ;===================================================
   (define (sleep)
     (wait SLEEP_TIME_SECONDS)
     (set! put-in-bed #f)
     (tiredness-level 'lower!))
+
+  ;===================================================
+  ; Method dont-sleep
+  ; Spec: (  -> { #<void> } )
+  ; Desc: set put-in-bed to #f and calls lower-tiredness-level!
+  ; Args: /
+  ;===================================================
+  (define (dont-sleep)
+    (set! put-in-bed #f))
 
   ;===================================================
   ; Method true-condition?
@@ -43,29 +52,40 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-docile 'add-transition! (fsm-transition (λ () (rebelliosity-level 'high?)) state-rebellish))
-    (state-docile 'add-transition! (fsm-transition true-condition? state-docile))
+    (state-awake 'add-transition! (fsm-transition (λ () (tiredness-level 'high?)) state-tired))
+    (state-awake 'add-transition! (fsm-transition (λ () (and put-in-bed (not (rebels?)))) state-asleep))
+    (state-awake 'add-transition! (fsm-transition (λ () (and put-in-bed (rebels?))) state-refused))
+    (state-awake 'add-transition! (fsm-transition true-condition? state-awake))
     ;;---
-    (state-rebellish 'add-transition! (fsm-transition (λ () punishment-given) state-getting-punished))
-    (state-rebellish 'add-transition! (fsm-transition (λ () (rebelliosity-level 'low?)) state-docile))
-    (state-rebellish 'add-transition! (fsm-transition true-condition? state-rebellish))
+    (state-tired 'add-transition! (fsm-transition (λ () (and put-in-bed (not (rebels?)))) state-asleep))
+    (state-tired 'add-transition! (fsm-transition (λ () (and put-in-bed (rebels?))) state-refused))
+    (state-tired 'add-transition! (fsm-transition (λ () (tiredness-level 'low?)) state-awake))
+    (state-tired 'add-transition! (fsm-transition (λ () (tiredness-level 'deadly?)) state-dead))
+    (state-tired 'add-transition! (fsm-transition true-condition? state-tired))
     ;;---
-    (state-asleep 'add-transition! (fsm-transition true-condition? state-rebellish)))
+    (state-asleep 'add-transition! (fsm-transition true-condition? state-tired))
+    ;;---
+    (state-refused 'add-transition! (fsm-transition true-condition? state-tired)))
 
 
-  (define state-docile (fsm-state (λ () (rebelliosity-level 'raise!)) '() 2))
-  (define state-rebellish (fsm-state (λ () (rebelliosity-level 'raise!)) '() 3))
-  (define state-getting-punished (fsm-state receive-punishment '() 1))
+  (define state-awake (fsm-state (λ () (tiredness-level 'raise!)) '() 4))
+  (define state-tired (fsm-state (λ () (tiredness-level 'raise!)) '() 5))
+  (define state-asleep (fsm-state sleep '() 1))
+  (define state-refused (fsm-state dont-sleep '() 1))
+  (define state-dead (fsm-state '() '() 0))
+  
+  (define my-fsm (fsm state-awake))
+  
+  (define (sleep-fsm-object msg . args)
+    (let ((my-param (make-param args 'sleep-fsm-object)))
+      (case msg
+        ('tired? (eq? (my-fsm 'get-current-state) state-tired))
+        ('awake? (eq? (my-fsm 'get-current-state) state-awake))
+        ('sleeping? (eq? (my-fsm 'get-current-state) state-sleeping))
+        ('refused? (eq? (my-fsm 'get-current-state) state-refused))
+        ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        (else (apply my-fsm msg args)))))
   
   (init-transitions)
   
-  (define my-fsm (fsm state-docile))
-  
-  (define (docility-fsm-object msg . args)
-    (let ((my-param (make-param 'docility-fsm-object)))
-      (case msg
-        ('rebellish? (eq? (my-fsm 'get-current-state) state-rebellish))
-        ('docile? (eq? (my-fsm 'get-current-state) state-docile))
-        ('getting-punished? (eq? (my-fsm 'get-current-state) state-getting-punished))
-        (else (apply my-fsm msg args)))))
-  docility-fsm-object)
+  sleep-fsm-object)

@@ -12,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (waste-fsm)
+(define (waste-fsm external)
   (define waste-level (need-level))
   (define clean-waste #f)
   
@@ -61,7 +61,7 @@
   (define state-cleaning (fsm-state clean '() 1))
   (define state-sickening (fsm-state (λ () (external 'health 'sicken!)) '() 1))
   
-  (define my-fsm (fsm state-awake))
+  (define my-fsm (fsm state-clean))
   
   (define (waste-fsm-object msg . args)
     (let ((my-param (make-param args 'waste-fsm-object)))

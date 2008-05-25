@@ -1,0 +1,4 @@
+;; Simulation functions
+
+(define (write . parms)
+  (for-each display parms))

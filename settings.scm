@@ -2,6 +2,8 @@
 ; Desc: Non-runtime settings
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
+(define RUN_ON_ARM #f)
+
 ; FSM Settings
 ;***************
 

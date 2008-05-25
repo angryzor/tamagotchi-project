@@ -12,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (docility-fsm)
+(define (docility-fsm external)
   (define rebelliosity-level (need-level))
   (define punishment-given #f)
   
@@ -22,9 +22,20 @@
   ; Desc: set punishment-given to #f and calls lower-rebelliosity-level!
   ; Args: /
   ;===================================================
-  (define (sleep)
+  (define (receive-punishment)
     (set! punishment-given #f)
     (rebelliosity-level 'lower!))
+
+  ;===================================================
+  ; Method rebels?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: checks random value
+  ; Args: /
+  ;===================================================
+  (define (rebels?)
+    (if (eq? (my-fsm 'get-current-state) state-rebellish)
+        #t
+        (< (rand 'get 0 100) 10)))
 
   ;===================================================
   ; Method true-condition?
@@ -65,6 +76,7 @@
         ('docile? (eq? (my-fsm 'get-current-state) state-docile))
         ('getting-punished? (eq? (my-fsm 'get-current-state) state-getting-punished))
         ('dead? #f)
+        ('rebels? (rebels?))
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

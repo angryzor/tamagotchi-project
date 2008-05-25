@@ -12,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (sleep-fsm)
+(define (sleep-fsm external)
   (define tiredness-level (need-level))
   (define put-in-bed #f)
   
@@ -35,6 +35,15 @@
   ;===================================================
   (define (dont-sleep)
     (set! put-in-bed #f))
+
+  ;===================================================
+  ; Method rebels?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: does external call to see if the animal rebels.
+  ; Args: /
+  ;===================================================
+  (define (rebels?)
+    (external 'docility 'rebels?))
 
   ;===================================================
   ; Method true-condition?

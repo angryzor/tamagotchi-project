@@ -12,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (health-fsm)
+(define (health-fsm external)
   (define sickness-level (need-level))
   (define give-medicine #f)
   
@@ -34,6 +34,15 @@
   ;===================================================
   (define (refuse-medicine)
     (set! give-medicine #f))
+
+  ;===================================================
+  ; Method rebels?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: does external call to see if the animal rebels.
+  ; Args: /
+  ;===================================================
+  (define (rebels?)
+    (external 'docility 'rebels?))
 
   ;===================================================
   ; Method true-condition?
@@ -73,7 +82,7 @@
   (define state-refused (fsm-state refuse-medicine '() 1))
   (define state-dead (fsm-state '() '() 0))
   
-  (define my-fsm (fsm state-awake))
+  (define my-fsm (fsm state-healthy))
   
   (define (health-fsm-object msg . args)
     (let ((my-param (make-param args 'health-fsm-object)))

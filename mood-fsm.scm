@@ -12,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (mood-fsm)
+(define (mood-fsm external)
   (define unhappiness-level (need-level))
   (define play-game #f)
     
@@ -45,6 +45,15 @@
     (set! play-game #f))
   
   ;===================================================
+  ; Method rebels?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: does external call to see if the animal rebels.
+  ; Args: /
+  ;===================================================
+  (define (rebels?)
+    (external 'docility 'rebels?))
+
+  ;===================================================
   ; Method init-transitions
   ; Spec: (  -> { #<void> } )
   ; Desc: adds transitions to all states (must be called after the states are created)
@@ -66,13 +75,13 @@
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-unhappy)))
 
-  (define state-happy (fsm-state raise-unhappiness-level! '() 4))
-  (define state-unhappy (fsm-state raise-unhappiness-level! '() 5))
-  (define state-playing-game (fsm-state eat-the-food! '() 1))
+  (define state-happy (fsm-state (λ () (unhappiness-level 'raise!)) '() 4))
+  (define state-unhappy (fsm-state (λ () (unhappiness-level 'raise!)) '() 5))
+  (define state-playing-game (fsm-state play-a-game '() 1))
   (define state-refused (fsm-state reject-a-game '() 1))
   (define state-dead (fsm-state '() '() 0))    ; suicide? :S
   
-  (define my-fsm (fsm state-satisfied))
+  (define my-fsm (fsm state-happy))
   
   (define (mood-fsm-object msg . args)
     (let ((my-param (make-param args 'mood-fsm-object)))

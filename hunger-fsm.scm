@@ -12,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (hunger-fsm)
+(define (hunger-fsm external)
   (define hunger-level (need-level))
   (define food-offered #f)
   
@@ -34,6 +34,15 @@
   ;===================================================
   (define (reject-the-food!)
     (set! food-offered #f))
+
+  ;===================================================
+  ; Method rebels?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: does external call to see if the animal rebels.
+  ; Args: /
+  ;===================================================
+  (define (rebels?)
+    (external 'docility 'rebels?))
 
   ;===================================================
   ; Method true-condition?
