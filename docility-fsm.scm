@@ -77,6 +77,7 @@
         ('getting-punished? (eq? (my-fsm 'get-current-state) state-getting-punished))
         ('dead? #f)
         ('rebels? (rebels?))
+        ('punish (set! punishment-given #t))
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

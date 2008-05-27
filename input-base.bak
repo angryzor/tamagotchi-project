@@ -1,0 +1,11 @@
+(define (input proc-that-gets-input)
+  (define (check-for-input)
+    (proc-that-gets-input))
+  
+  (define (input msg . args)
+    (let ((my-param (make-param args 'input-object)))
+      (case msg
+        ('transition (transition-all))
+        ('one-dead? (one-dead?))
+        (else (error 'input-object "message \"~S\" unknown" msg)))))
+  input-object)

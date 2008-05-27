@@ -41,11 +41,17 @@
       (death-map 'foldl (λ (x y)
                           (or x y)) #f)))
   
+  (define (send-to-all msg . args)
+    (fsms 'for-each (λ (x)
+                         (apply (fsm-obj x) msg args))))
+  
   (define (tama-fsm-bundler-object msg . args)
     (let ((my-param (make-param args 'tama-fsm-bundler-object)))
       (case msg
         ('transition (transition-all))
         ('one-dead? (one-dead?))
+        ('send-to-all (apply send-to-all args))
+        ('send-to (apply fsm-external-procedure-call args))
         (else (error 'tama-fsm-bundler-object "message \"~S\" unknown" msg)))))
   
   (add-fsms)

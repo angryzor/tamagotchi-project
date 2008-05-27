@@ -26,6 +26,7 @@
     ;;;; Analog/Digital Converter
     
     (define (bit nr) (ash 1 nr)) ; helper function
+    (define (getbit val nr) (logand 1 (ash val (- nr))))
     (define pin bit)
     
     ;;;  A/D Control Register Offsets (ad-control)
@@ -56,6 +57,8 @@
     (define IOxCLR #x0C)  ; IOxCLR register offset
     (define IOxDIR #x08)  ; IOxDIR register offset
     
+    (define (read-pin pin-nr)
+      (= (getbit (read GPIO_0 IOxPIN) pin-nr) 1))
     (define (set-pin pin)
       (write pin GPIO_0 IOxSET))
     (define (clear-pin pin)
@@ -63,6 +66,10 @@
     (define (output-pin pin)
       (write (logior (read GPIO_0 IOxDIR)
                      pin)
+             GPIO_0 IOxDIR))
+    (define (input-pin pin)
+      (write (logand (read GPIO_0 IOxDIR)
+                     (lognot pin))
              GPIO_0 IOxDIR))
     
     ;;;; Timer Definitions

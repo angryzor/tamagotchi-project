@@ -91,6 +91,7 @@
         ('playing-game? (eq? (my-fsm 'get-current-state) state-playing-game))
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        ('play-a-game (set! play-game #t))
         (else (apply my-fsm msg args)))))
 
   (init-transitions)

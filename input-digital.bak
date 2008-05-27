@@ -1,0 +1,14 @@
+(define (input-digital gpio pin-id)
+  (define inpt (input this-init this-check))
+  
+  (define (this-init)
+    (input-pin (pin pin-id)))
+  
+  (define (this-check)
+    (read-pin pin-id))
+  
+  (let ((my-param (make-param args 'input-object)))
+    (case msg
+      ('check (check))
+      (else (error 'input-object "message \"~S\" unknown" msg))))
+  input-object)

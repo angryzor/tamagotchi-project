@@ -92,6 +92,7 @@
         ('eating? (eq? (my-fsm 'get-current-state) state-eating))
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        ('feed (set! food-offered #t))
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

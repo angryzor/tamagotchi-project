@@ -3,6 +3,7 @@
 ;*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
 (load "fsm.scm")
+(load "need-level.scm")
 
 ;***************************************************
 ; Object hunger-fsm
@@ -11,7 +12,7 @@
 ; Args: /
 ;***************************************************
 
-(define (hunger-fsm)
+(define (hunger-fsm external)
   (define hunger-level (need-level))
   (define food-offered #f)
   
@@ -33,6 +34,15 @@
   ;===================================================
   (define (reject-the-food!)
     (set! food-offered #f))
+
+  ;===================================================
+  ; Method rebels?
+  ; Spec: (  -> { #<void> } )
+  ; Desc: does external call to see if the animal rebels.
+  ; Args: /
+  ;===================================================
+  (define (rebels?)
+    (external 'docility 'rebels?))
 
   ;===================================================
   ; Method true-condition?
@@ -72,12 +82,10 @@
   (define state-refused (fsm-state reject-the-food! '() 1))
   (define state-dead (fsm-state '() '() 0))
   
-  (init-transitions)
-  
   (define my-fsm (fsm state-satisfied))
   
   (define (hunger-fsm-object msg . args)
-    (let ((my-param (make-param 'hunger-fsm-object)))
+    (let ((my-param (make-param args 'hunger-fsm-object)))
       (case msg
         ('hungry? (eq? (my-fsm 'get-current-state) state-hungry))
         ('satisfied? (eq? (my-fsm 'get-current-state) state-satisfied))
@@ -85,4 +93,7 @@
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         (else (apply my-fsm msg args)))))
+  
+  (init-transitions)
+
   hunger-fsm-object)

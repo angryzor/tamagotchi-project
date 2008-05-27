@@ -71,6 +71,7 @@
         ('cleaning? (eq? (my-fsm 'get-current-state) state-cleaning))
         ('sickening (eq? (my-fsm 'get-current-state) state-sickening))
         ('dead? #f)
+        ('clean (set! clean-waste #t))
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

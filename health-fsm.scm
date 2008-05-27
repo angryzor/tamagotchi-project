@@ -93,6 +93,7 @@
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         ('sicken! (sickness-level 'raise!))
+        ('cure (set! give-medicine #t))
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

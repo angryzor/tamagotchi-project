@@ -93,6 +93,7 @@
         ('sleeping? (eq? (my-fsm 'get-current-state) state-sleeping))
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
+        ('put-in-bed (set! put-in-bed #t))
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

@@ -22,3 +22,6 @@
 (define ash arithmetic-shift)
 
 (define logior bitwise-ior)
+(define logand bitwise-and)
+(define lognot bitwise-not)
+(define logxor bitwise-xor)

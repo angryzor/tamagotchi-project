@@ -1,0 +1,11 @@
+(define (input-binding inpt proc)
+  (define (check)
+    (if (inpt 'check)
+        proc))
+  
+  (define (input-binding-object)
+    (let ((my-param (make-param args 'input-binding-object)))
+      (case msg
+        (else (apply inpt msg args)))))
+  
+  input-binding-object)
