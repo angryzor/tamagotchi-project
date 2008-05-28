@@ -42,8 +42,8 @@
                           (or x y)) #f)))
   
   (define (send-to-all msg . args)
-    (fsms 'for-each (λ (x)
-                         (apply (fsm-obj x) msg args))))
+    (fsms 'map (λ (x)
+                 (apply (fsm-obj x) msg args)) eq?))
   
   (define (tama-fsm-bundler-object msg . args)
     (let ((my-param (make-param args 'tama-fsm-bundler-object)))
@@ -51,7 +51,15 @@
         ('transition (transition-all))
         ('one-dead? (one-dead?))
         ('send-to-all (apply send-to-all args))
-        ('send-to (apply fsm-external-procedure-call args))
+        ('send-to (let ((r (apply fsm-external-procedure-call args)))
+                    (display "sending ")
+                    (display (car args))
+                    (display " ")
+                    (display (cadr args))
+                    (display ", returns: ")
+                    (display r)
+                    (newline)
+                    r))
         (else (error 'tama-fsm-bundler-object "message \"~S\" unknown" msg)))))
   
   (add-fsms)

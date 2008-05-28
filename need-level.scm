@@ -77,5 +77,6 @@
         ('low? (low?))
         ('critical? (critical?))
         ('deadly? (deadly?))
+        ('percent level)
         (else (error 'level-object "message \"~S\" unknown" msg)))))
   level-object)

@@ -51,14 +51,15 @@
     (state-disgusting 'add-transition! (fsm-transition (λ () (waste-level 'deadly?)) state-sickening))
     (state-disgusting 'add-transition! (fsm-transition true-condition? state-disgusting))
     ;;---
-    (state-cleaning 'add-transition! (fsm-transition true-condition? state-disgusting))
+    (state-cleaning 'add-transition! (fsm-transition (λ () (waste-level 'low?)) state-clean))
+    (state-cleaning 'add-transition! (fsm-transition (λ () (waste-level 'high?)) state-disgusting))
     ;;---
     (state-sickening 'add-transition! (fsm-transition true-condition? state-disgusting)))
 
 
   (define state-clean (fsm-state (λ () (waste-level 'raise!)) '() 3))
   (define state-disgusting (fsm-state (λ () (waste-level 'raise!)) '() 4))
-  (define state-cleaning (fsm-state clean '() 1))
+  (define state-cleaning (fsm-state clean '() 2))
   (define state-sickening (fsm-state (λ () (external 'health 'sicken!)) '() 1))
   
   (define my-fsm (fsm state-clean))
@@ -69,9 +70,10 @@
         ('disgusting? (eq? (my-fsm 'get-current-state) state-disgusting))
         ('clean? (eq? (my-fsm 'get-current-state) state-clean))
         ('cleaning? (eq? (my-fsm 'get-current-state) state-cleaning))
-        ('sickening (eq? (my-fsm 'get-current-state) state-sickening))
+        ('sickening? (eq? (my-fsm 'get-current-state) state-sickening))
         ('dead? #f)
         ('clean (set! clean-waste #t))
+        ('level waste-level)
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

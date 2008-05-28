@@ -2,7 +2,7 @@
   (define (check)
     (proc-that-gets-input))
   
-  (define (input-base msg . args)
+  (define (input-base-object msg . args)
     (let ((my-param (make-param args 'input-base-object)))
       (case msg
         ('check (check))

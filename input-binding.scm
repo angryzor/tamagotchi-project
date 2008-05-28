@@ -1,9 +1,9 @@
 (define (input-binding inpt proc)
   (define (check)
     (if (inpt 'check)
-        proc))
+        (proc)))
   
-  (define (input-binding-object)
+  (define (input-binding-object msg . args)
     (let ((my-param (make-param args 'input-binding-object)))
       (case msg
         ('check (check))

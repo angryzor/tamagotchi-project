@@ -72,14 +72,15 @@
     (state-tired 'add-transition! (fsm-transition (λ () (tiredness-level 'deadly?)) state-dead))
     (state-tired 'add-transition! (fsm-transition true-condition? state-tired))
     ;;---
-    (state-asleep 'add-transition! (fsm-transition true-condition? state-tired))
+    (state-asleep 'add-transition! (fsm-transition (λ () (tiredness-level 'low?)) state-awake))
+    (state-asleep 'add-transition! (fsm-transition (λ () (tiredness-level 'high?)) state-tired))
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-tired)))
 
 
   (define state-awake (fsm-state (λ () (tiredness-level 'raise!)) '() 4))
   (define state-tired (fsm-state (λ () (tiredness-level 'raise!)) '() 5))
-  (define state-asleep (fsm-state sleep '() 1))
+  (define state-asleep (fsm-state sleep '() 2))
   (define state-refused (fsm-state dont-sleep '() 1))
   (define state-dead (fsm-state '() '() 0))
   
@@ -94,6 +95,7 @@
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         ('put-in-bed (set! put-in-bed #t))
+        ('level tiredness-level)
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

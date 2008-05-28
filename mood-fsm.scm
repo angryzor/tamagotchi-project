@@ -71,13 +71,14 @@
     (state-unhappy 'add-transition! (fsm-transition (λ () (unhappiness-level 'deadly?)) state-dead))
     (state-unhappy 'add-transition! (fsm-transition true-condition? state-unhappy))
     ;;---
-    (state-playing-game 'add-transition! (fsm-transition true-condition? state-unhappy))
+    (state-playing-game 'add-transition! (fsm-transition (λ () (unhappiness-level 'low?)) state-happy))
+    (state-playing-game 'add-transition! (fsm-transition (λ () (unhappiness-level 'high?)) state-unhappy))
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-unhappy)))
 
   (define state-happy (fsm-state (λ () (unhappiness-level 'raise!)) '() 4))
   (define state-unhappy (fsm-state (λ () (unhappiness-level 'raise!)) '() 5))
-  (define state-playing-game (fsm-state play-a-game '() 1))
+  (define state-playing-game (fsm-state play-a-game '() 2))
   (define state-refused (fsm-state reject-a-game '() 1))
   (define state-dead (fsm-state '() '() 0))    ; suicide? :S
   
@@ -92,6 +93,7 @@
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         ('play-a-game (set! play-game #t))
+        ('level unhappiness-level)
         (else (apply my-fsm msg args)))))
 
   (init-transitions)

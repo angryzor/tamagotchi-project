@@ -1,0 +1,9 @@
+(define (buzzer timer pin)
+  (define blinkbool #t)
+  (define (blinkcb)
+    (if blinkbool
+        (set-pin GPIO_0 6)
+        (clear-pin GPIO_0 6))
+    (set! blinkbool (not blinkbool)))
+  
+  

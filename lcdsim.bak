@@ -1,0 +1,20 @@
+(load "statusbar.scm")
+
+(define (lcd bundle)
+  (define sbar (statusbar (bundle 'send-to-all 'level) fill-rectangle))
+  
+  (define (init)
+    (init-lcd))
+  
+  (define (update)
+    (sbar 'draw))
+  
+  (define (lcd-object msg . args)
+    (let ((my-param (make-param args 'lcd-object)))
+      (case msg
+        ('update (update))
+        (else (error 'lcd-object "message \"~S\" unknown" msg)))))
+  
+  (init)
+  
+  lcd-object)

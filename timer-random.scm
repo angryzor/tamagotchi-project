@@ -1,4 +1,5 @@
 (define (random-generator timer . dontrun)
+  (define pausesave 0)
   (define (resume)
     (timer.stop TIMER0) ; safety measure (to not mess up possible already running timers)
     (timer.set-PR TIMER0 0)

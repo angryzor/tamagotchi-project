@@ -1,0 +1,6 @@
+(load "statusbar.scm")
+
+(define (output bundle)
+  (define sbar (statusbar (bundle 'send-to-all 'level) fill-rectangle))
+  
+  

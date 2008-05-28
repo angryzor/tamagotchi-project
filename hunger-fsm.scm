@@ -71,14 +71,15 @@
     (state-hungry 'add-transition! (fsm-transition (λ () (hunger-level 'deadly?)) state-dead))
     (state-hungry 'add-transition! (fsm-transition true-condition? state-hungry))
     ;;---
-    (state-eating 'add-transition! (fsm-transition true-condition? state-hungry))
+    (state-eating 'add-transition! (fsm-transition (λ () (hunger-level 'low?)) state-satisfied))
+    (state-eating 'add-transition! (fsm-transition (λ () (hunger-level 'high?)) state-hungry))
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-hungry)))
 
     
   (define state-satisfied (fsm-state (λ () (hunger-level 'raise!)) '() 4))
   (define state-hungry (fsm-state (λ () (hunger-level 'raise!)) '() 5))
-  (define state-eating (fsm-state eat-the-food! '() 1))
+  (define state-eating (fsm-state eat-the-food! '() 2))
   (define state-refused (fsm-state reject-the-food! '() 1))
   (define state-dead (fsm-state '() '() 0))
   
@@ -93,6 +94,7 @@
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         ('feed (set! food-offered #t))
+        ('level hunger-level)
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

@@ -60,12 +60,13 @@
     (state-rebellish 'add-transition! (fsm-transition (λ () (rebelliosity-level 'low?)) state-docile))
     (state-rebellish 'add-transition! (fsm-transition true-condition? state-rebellish))
     ;;---
-    (state-getting-punished 'add-transition! (fsm-transition true-condition? state-rebellish)))
+    (state-getting-punished 'add-transition! (fsm-transition (λ () (rebelliosity-level 'low?)) state-docile))
+    (state-getting-punished 'add-transition! (fsm-transition (λ () (rebelliosity-level 'high?)) state-rebellish)))
 
 
   (define state-docile (fsm-state (λ () (rebelliosity-level 'raise!)) '() 2))
   (define state-rebellish (fsm-state (λ () (rebelliosity-level 'raise!)) '() 3))
-  (define state-getting-punished (fsm-state receive-punishment '() 1))
+  (define state-getting-punished (fsm-state receive-punishment '() 2))
   
   (define my-fsm (fsm state-docile))
   
@@ -78,6 +79,7 @@
         ('dead? #f)
         ('rebels? (rebels?))
         ('punish (set! punishment-given #t))
+        ('level rebelliosity-level)
         (else (apply my-fsm msg args)))))
   
   (init-transitions)

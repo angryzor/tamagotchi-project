@@ -1,15 +1,19 @@
 (load "input.scm")
+(load "ld-lcd.scm")
+(load "buzzer.scm")
 (load "tama-fsm-bundler.scm")
 
 (define (tamagotchi-manager)
   (define fsm-bundle (tama-fsm-bundler))
   (define input (input-mapper))
+  (define my-lcd (lcd fsm-bundle))
+  (define my-buzz (buzzer GPIO_0 11))
   
   (define (init-input)
-    (let ((b0-press (input-digital GPIO_0 6))
-          (b1-press (input-digital GPIO_0 7))
-          (b2-press (input-digital GPIO_0 8))
-          (b3-press (input-digital GPIO_0 9))
+    (let ((b0-press (input-digital GPIO_0 7))
+          (b1-press (input-digital GPIO_0 8))
+          (b2-press (input-digital GPIO_0 9))
+          (b3-press (input-digital GPIO_0 10))
           (temp-hot (input-analog 'ain0 (λ (val)
                                       (> val 75))))
           (ldr-dark (input-analog 'ain1 (λ (val)
@@ -27,7 +31,16 @@
       (input 'map ldr-dark (λ ()
                              (fsm-bundle 'send-to 'sleep 'put-in-bed)))))
 
-  
+;;==========================================================
+  (define (beep-if-necessary)
+    (if (or (fsm-bundle 'send-to 'hunger 'hungry?)
+            (fsm-bundle 'send-to 'mood 'unhappy?)
+            (fsm-bundle 'send-to 'waste 'disgusting?)
+            (fsm-bundle 'send-to 'health 'sick?)
+            (fsm-bundle 'send-to 'sleep 'tired?)
+            (and (fsm-bundle 'send-to 'docility 'rebels?)
+                 (> (rand 'get 0 100) 85)))
+        (my-buzz 'beep 1000000)))
 ;;==========================================================
   (define (transition-all-fsms)
     (fsm-bundle 'transition))
@@ -40,10 +53,12 @@
         (begin
           (display "TRANSITIONING")
           (newline)
-          (check-input)
+          (let iptloop
+            (input 'check)
           (transition-all-fsms)
-;         (disp-output))
+          (my-lcd 'update)
+          (beep-if-necessary)
           (mainloop))))
-  
+  (init-input)
   (mainloop)
   )

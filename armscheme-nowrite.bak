@@ -2,12 +2,6 @@
 
 ;;;; Boot File, only execute this code once per memory flash
 
-(define s (open-output-file "boot"))
-
-;; write to file ...
-(write 
- '(begin
-    
     ;;;; Utility Functions
     (define (reduce reduce-fun args)
       (if (pair? args)
@@ -27,11 +21,12 @@
     ;; write pin select's default:
     ;;  P0.00 -> P0.26 setting 00 (gpio0 usually)
     ;;  P0.27 -> P0.30 setting 01 (ain0, analog input for a/d converter)
-    (write #x15400000 pinsel1 0) ; proper reset value
+;    (write #x15400000 pinsel1 0) ; proper reset value
     
     ;;;; Analog/Digital Converter
     
     (define (bit nr) (ash 1 nr)) ; helper function
+    (define (getbit val nr) (logand 1 (ash val (- nr))))
     (define pin bit)
     
     ;;;  A/D Control Register Offsets (ad-control)
@@ -62,6 +57,8 @@
     (define IOxCLR #x0C)  ; IOxCLR register offset
     (define IOxDIR #x08)  ; IOxDIR register offset
     
+    (define (read-pin pin-nr)
+      (= (getbit (read GPIO_0 IOxPIN) pin-nr) 1))
     (define (set-pin pin)
       (write pin GPIO_0 IOxSET))
     (define (clear-pin pin)
@@ -69,6 +66,10 @@
     (define (output-pin pin)
       (write (logior (read GPIO_0 IOxDIR)
                      pin)
+             GPIO_0 IOxDIR))
+    (define (input-pin pin)
+      (write (logand (read GPIO_0 IOxDIR)
+                     (lognot pin))
              GPIO_0 IOxDIR))
     
     ;;;; Timer Definitions
@@ -153,10 +154,10 @@
     ;; returns a normalized [0-1]
     (define (measure msg)
       (case msg
-        ('ain0 => (measure-pin 0))  ; P0.27
-        ('ain1 => (measure-pin 1))  ; P0.28
-        ('ain2 => (measure-pin 2))  ; P0.29
-        ('ain3 => (measure-pin 3))  ; P0.30
+        ('ain0 (measure-pin 0))  ; P0.27
+        ('ain1 (measure-pin 1))  ; P0.28
+        ('ain2 (measure-pin 2))  ; P0.29
+        ('ain3 (measure-pin 3))  ; P0.30
         ('all (map measure-pin (list 0 1 2 3)))
         (else (display "error: did not understand message ")
               (display msg) (newline))))
@@ -541,66 +542,3 @@
         (for-each (lambda (colour)
                     (send-byte lcd-data colour))
                   colour-map)))
-    ) s)
-(close-output-port s) 
-
-;;;; Load and execute the boot file, run this after every reset
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(let ((bootport (open-input-file "boot")))
-  (eval (read bootport) (interaction-environment))
-  (close-input-port bootport))
-
-;;;; Testing LCD
-;;;;;;;;;;;;;;;;
-
-(init-lcd)
-(fill-rectangle 0 0 131 131 colour-white)
-(write-string "initialization" 10 10)
-(write-string "finished" 10 20)
-(write-string "at your command" 10 40)
-
-;;;; Theremin
-;;;;;;;;;;;;;
-
-(let ((bootport (open-input-file "boot")))
-  (eval (read bootport) (interaction-environment))
-  (close-input-port bootport))
-
-;; theremin example using time-counter to deduct the time it took to perform the measurement
-(define (run-theremin buzzer-pin)
-  (output-pin buzzer-pin)
-  (define *last-beep* (time-counter))
-  (loop (lambda ()
-          (let ((interval (round (* 4000 (measure 'ain0)))))
-            (wait-us (abs (- interval (- (time-counter) *last-beep*))))
-            (set-pin buzzer-pin)
-            (wait-us interval)
-            (clear-pin buzzer-pin)
-            (set! *last-beep* (time-counter))
-            ))
-        500))
-
-; buzzer in pin 7
-; (run-theremin (ash 1 7))
-
-
-;;;; Example Drawing Functions
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(define (clear-screen . clear-colour)
-  ;; default value is white
-  (if (null? clear-colour)
-      (clear-screen colour-white)
-      (fill-rectangle 0 0 131 131 (car clear-colour))))
-
-
-(define (draw-cross colour)
-  (define (iter-cross i)
-    (if (< i 132)
-        (begin 
-          (fill-rectangle i i 1 1 colour)
-          (fill-rectangle (- 131 i) i 1 1 colour) 
-          (iter-cross (+ i 1)))))
-  (iter-cross 0))
-(draw-cross colour-black)
-
