@@ -30,7 +30,7 @@
                    (wait-us delay)
                    (iter (- itime 1)))))
       (iter (/ time delay 2)))
-    (blink (/ 1000000 440)))
+    (blink (round (/ 1000000 440))))
   
   (define (buzzer-object msg . args)
     (let ((my-param (make-param args 'buzzer-object)))

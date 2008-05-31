@@ -4,6 +4,7 @@
 
 (load "fsm.scm")
 (load "need-level.scm")
+(load "simple-game.scm")
 
 ;***************************************************
 ; Object mood-fsm
@@ -12,9 +13,15 @@
 ; Args: /
 ;***************************************************
 
-(define (mood-fsm external)
+(define (mood-fsm external input)
   (define unhappiness-level (need-level))
   (define play-game #f)
+  (define game (simple-game input
+                            (lambda ()
+                              (unhappiness-level 'lower!)
+                              (display "Yay!"))
+                            (lambda ()
+                              (display "Aww =("))))
     
   ;===================================================
   ; Method true-condition?
@@ -32,7 +39,7 @@
   ; Args: /
   ;===================================================
   (define (play-a-game)
-    ;; Do something here with passed procedures to start a game
+    (game 'start)
     (set! play-game #f))
   
   ;===================================================
@@ -60,24 +67,24 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-happy 'add-transition! (fsm-transition (λ () (unhappiness-level 'high?)) state-unhappy))
-    (state-happy 'add-transition! (fsm-transition (λ () (and play-game (not (rebels?)))) state-playing-game))
-    (state-happy 'add-transition! (fsm-transition (λ () (and play-game (rebels?))) state-refused))
+    (state-happy 'add-transition! (fsm-transition (lambda () (unhappiness-level 'high?)) state-unhappy))
+    (state-happy 'add-transition! (fsm-transition (lambda () (and play-game (not (rebels?)))) state-playing-game))
+    (state-happy 'add-transition! (fsm-transition (lambda () (and play-game (rebels?))) state-refused))
     (state-happy 'add-transition! (fsm-transition true-condition? state-happy))
     ;;---
-    (state-unhappy 'add-transition! (fsm-transition (λ () (and play-game (not (rebels?)))) state-playing-game))
-    (state-unhappy 'add-transition! (fsm-transition (λ () (and play-game (rebels?))) state-refused))
-    (state-unhappy 'add-transition! (fsm-transition (λ () (unhappiness-level 'low?)) state-happy))
-    (state-unhappy 'add-transition! (fsm-transition (λ () (unhappiness-level 'deadly?)) state-dead))
+    (state-unhappy 'add-transition! (fsm-transition (lambda () (and play-game (not (rebels?)))) state-playing-game))
+    (state-unhappy 'add-transition! (fsm-transition (lambda () (and play-game (rebels?))) state-refused))
+    (state-unhappy 'add-transition! (fsm-transition (lambda () (unhappiness-level 'low?)) state-happy))
+    (state-unhappy 'add-transition! (fsm-transition (lambda () (unhappiness-level 'deadly?)) state-dead))
     (state-unhappy 'add-transition! (fsm-transition true-condition? state-unhappy))
     ;;---
-    (state-playing-game 'add-transition! (fsm-transition (λ () (unhappiness-level 'low?)) state-happy))
-    (state-playing-game 'add-transition! (fsm-transition (λ () (unhappiness-level 'high?)) state-unhappy))
+    (state-playing-game 'add-transition! (fsm-transition (lambda () (unhappiness-level 'low?)) state-happy))
+    (state-playing-game 'add-transition! (fsm-transition (lambda () (unhappiness-level 'high?)) state-unhappy))
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-unhappy)))
 
-  (define state-happy (fsm-state (λ () (unhappiness-level 'raise!)) '() 4))
-  (define state-unhappy (fsm-state (λ () (unhappiness-level 'raise!)) '() 5))
+  (define state-happy (fsm-state (lambda () (unhappiness-level 'raise!)) '() 4))
+  (define state-unhappy (fsm-state (lambda () (unhappiness-level 'raise!)) '() 5))
   (define state-playing-game (fsm-state play-a-game '() 2))
   (define state-refused (fsm-state reject-a-game '() 1))
   (define state-dead (fsm-state '() '() 0))    ; suicide? :S

@@ -24,7 +24,8 @@
   ;===================================================
   (define (clean)
     (set! clean-waste #f)
-    (waste-level 'lower!))
+    (waste-level 'lower!)
+    (display "cleaning"))
 
   ;===================================================
   ; Method true-condition?
@@ -42,25 +43,25 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-clean 'add-transition! (fsm-transition (λ () (waste-level 'high?)) state-disgusting))
-    (state-clean 'add-transition! (fsm-transition (λ () clean-waste) state-cleaning))
+    (state-clean 'add-transition! (fsm-transition (lambda () (waste-level 'high?)) state-disgusting))
+    (state-clean 'add-transition! (fsm-transition (lambda () clean-waste) state-cleaning))
     (state-clean 'add-transition! (fsm-transition true-condition? state-clean))
     ;;---
-    (state-disgusting 'add-transition! (fsm-transition (λ () clean-waste) state-cleaning))
-    (state-disgusting 'add-transition! (fsm-transition (λ () (waste-level 'low?)) state-clean))
-    (state-disgusting 'add-transition! (fsm-transition (λ () (waste-level 'deadly?)) state-sickening))
+    (state-disgusting 'add-transition! (fsm-transition (lambda () clean-waste) state-cleaning))
+    (state-disgusting 'add-transition! (fsm-transition (lambda () (waste-level 'low?)) state-clean))
+    (state-disgusting 'add-transition! (fsm-transition (lambda () (waste-level 'deadly?)) state-sickening))
     (state-disgusting 'add-transition! (fsm-transition true-condition? state-disgusting))
     ;;---
-    (state-cleaning 'add-transition! (fsm-transition (λ () (waste-level 'low?)) state-clean))
-    (state-cleaning 'add-transition! (fsm-transition (λ () (waste-level 'high?)) state-disgusting))
+    (state-cleaning 'add-transition! (fsm-transition (lambda () (waste-level 'low?)) state-clean))
+    (state-cleaning 'add-transition! (fsm-transition (lambda () (waste-level 'high?)) state-disgusting))
     ;;---
     (state-sickening 'add-transition! (fsm-transition true-condition? state-disgusting)))
 
 
-  (define state-clean (fsm-state (λ () (waste-level 'raise!)) '() 3))
-  (define state-disgusting (fsm-state (λ () (waste-level 'raise!)) '() 4))
+  (define state-clean (fsm-state (lambda () (waste-level 'raise!)) '() 3))
+  (define state-disgusting (fsm-state (lambda () (waste-level 'raise!)) '() 4))
   (define state-cleaning (fsm-state clean '() 2))
-  (define state-sickening (fsm-state (λ () (external 'health 'sicken!)) '() 1))
+  (define state-sickening (fsm-state (lambda () (external 'health 'sicken!)) '() 1))
   
   (define my-fsm (fsm state-clean))
   

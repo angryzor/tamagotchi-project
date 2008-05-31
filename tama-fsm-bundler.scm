@@ -5,7 +5,7 @@
 (load "health-fsm.scm")
 (load "waste-fsm.scm")
 
-(define (tama-fsm-bundler)
+(define (tama-fsm-bundler input)
   (define fsm-id car)
   (define fsm-obj cdr)
   
@@ -15,7 +15,7 @@
   (define (add-fsms)
     (fsms 'add-after! (cons 'hunger (hunger-fsm fsm-external-procedure-call)))
     (fsms 'add-after! (cons 'sleep (sleep-fsm fsm-external-procedure-call)))
-    (fsms 'add-after! (cons 'mood (mood-fsm fsm-external-procedure-call)))
+    (fsms 'add-after! (cons 'mood (mood-fsm fsm-external-procedure-call input))) ; needs input for game...
     (fsms 'add-after! (cons 'docility (docility-fsm fsm-external-procedure-call)))
     (fsms 'add-after! (cons 'health (health-fsm fsm-external-procedure-call)))
     (fsms 'add-after! (cons 'waste (waste-fsm fsm-external-procedure-call))))
@@ -29,7 +29,7 @@
                       ((fsm-obj x) 'transition))))
   
   (define (one-dead?)
-    (let ((death-map (fsms 'map (λ (x)                                  ;;;;; TODO: REMOVE DBUG CODE
+    (let ((death-map (fsms 'map (lambda (x)                                  ;;;;; TODO: REMOVE DBUG CODE
                                   (let ((isdead ((fsm-obj x) 'dead?)))
                                     (if isdead
                                         (begin
@@ -38,11 +38,11 @@
                                           (display " REPORTS DEAD!")
                                           (newline)))
                                     isdead)) eq?)))
-      (death-map 'foldl (λ (x y)
+      (death-map 'foldl (lambda (x y)
                           (or x y)) #f)))
   
   (define (send-to-all msg . args)
-    (fsms 'map (λ (x)
+    (fsms 'map (lambda (x)
                  (apply (fsm-obj x) msg args)) eq?))
   
   (define (tama-fsm-bundler-object msg . args)
@@ -51,15 +51,7 @@
         ('transition (transition-all))
         ('one-dead? (one-dead?))
         ('send-to-all (apply send-to-all args))
-        ('send-to (let ((r (apply fsm-external-procedure-call args)))
-                    (display "sending ")
-                    (display (car args))
-                    (display " ")
-                    (display (cadr args))
-                    (display ", returns: ")
-                    (display r)
-                    (newline)
-                    r))
+        ('send-to (apply fsm-external-procedure-call args))
         (else (error 'tama-fsm-bundler-object "message \"~S\" unknown" msg)))))
   
   (add-fsms)

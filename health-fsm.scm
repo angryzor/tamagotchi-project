@@ -60,19 +60,19 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-healthy 'add-transition! (fsm-transition (λ () (sickness-level 'high?)) state-sick))
-    (state-healthy 'add-transition! (fsm-transition (λ () (and give-medicine (not (rebels?)))) state-healing))
-    (state-healthy 'add-transition! (fsm-transition (λ () (and give-medicine (rebels?))) state-refused))
+    (state-healthy 'add-transition! (fsm-transition (lambda () (sickness-level 'high?)) state-sick))
+    (state-healthy 'add-transition! (fsm-transition (lambda () (and give-medicine (not (rebels?)))) state-healing))
+    (state-healthy 'add-transition! (fsm-transition (lambda () (and give-medicine (rebels?))) state-refused))
     (state-healthy 'add-transition! (fsm-transition true-condition? state-healthy))
     ;;---
-    (state-sick 'add-transition! (fsm-transition (λ () (and give-medicine (not (rebels?)))) state-healing))
-    (state-sick 'add-transition! (fsm-transition (λ () (and give-medicine (rebels?))) state-refused))
-    (state-sick 'add-transition! (fsm-transition (λ () (sickness-level 'low?)) state-healthy))
-    (state-sick 'add-transition! (fsm-transition (λ () (sickness-level 'deadly?)) state-dead))
+    (state-sick 'add-transition! (fsm-transition (lambda () (and give-medicine (not (rebels?)))) state-healing))
+    (state-sick 'add-transition! (fsm-transition (lambda () (and give-medicine (rebels?))) state-refused))
+    (state-sick 'add-transition! (fsm-transition (lambda () (sickness-level 'low?)) state-healthy))
+    (state-sick 'add-transition! (fsm-transition (lambda () (sickness-level 'deadly?)) state-dead))
     (state-sick 'add-transition! (fsm-transition true-condition? state-sick))
     ;;---
-    (state-healing 'add-transition! (fsm-transition (λ () (sickness-level 'low?)) state-healthy))
-    (state-healing 'add-transition! (fsm-transition (λ () (sickness-level 'high?)) state-sick))
+    (state-healing 'add-transition! (fsm-transition (lambda () (sickness-level 'low?)) state-healthy))
+    (state-healing 'add-transition! (fsm-transition (lambda () (sickness-level 'high?)) state-sick))
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-sick)))
 

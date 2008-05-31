@@ -1,33 +1,3 @@
-; ADT double-linked-position-list< T >
-;=======================================
-; Specification:
-;---------------------------------------
-; vector-position-list: ( ( T T -> boolean ) . list< T > -> vector-position-list< T > )
-; length: ( -> number )
-; full?: ( -> boolean )
-; empty?: ( -> boolean )
-; map: ( ( T -> T ) ( T T -> boolean ) -> vector-position-list< T > )
-; map!: ( ( T -> T ) ( T T -> boolean ) -> {#t} )
-; foldl: ( ( T T -> T ) T -> T )
-; foldr: ( ( T T -> T ) T -> T )
-; first-position: ( -> vector-position< T > )
-; last-position: ( -> vector-position< T > )
-; find: ( T -> vector-position< T > )
-; delete!: ( vector-position< T > -> #<void> )
-; add-before!: ( T . vector-position< T > -> #<void> )
-; add-after!: ( T . vector-position< T > -> #<void> )
-; next: ( vector-position< T > -> vector-position< T > )
-; prev: ( vector-position< T > -> vector-position< T > )
-; has-prev?: ( vector-position< T > -> boolean )
-; has-next?: ( vector-position< T > -> boolean )
-; value: ( vector-position< T > -> T )
-; print: ( -> #<void> )
-; (): ( -> vector-position< T > )
-
-
-(load "globloader.scm")
-
-
 (define (vector-position-list size ==? . lst) ;lst is used if creating from scheme list
   (define vect (make-vector size))
   (define ptr 0)
@@ -278,3 +248,4 @@
 
 ; Makes the type of position list selectable by load
 (define position-list vector-position-list)
+

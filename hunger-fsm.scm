@@ -60,25 +60,27 @@
   ; Args: /
   ;===================================================
   (define (init-transitions)
-    (state-satisfied 'add-transition! (fsm-transition (λ () (hunger-level 'high?)) state-hungry))
-    (state-satisfied 'add-transition! (fsm-transition (λ () (and food-offered (not (rebels?)))) state-eating))
-    (state-satisfied 'add-transition! (fsm-transition (λ () (and food-offered (rebels?))) state-refused))
+    (state-satisfied 'add-transition! (fsm-transition (lambda () (hunger-level 'high?)) state-hungry))
+    (state-satisfied 'add-transition! (fsm-transition (lambda () (and food-offered (not (rebels?)))) 
+                                                      state-eating
+                                                      (lambda () (external 'health 'sicken!)))) ; if eats when satisfied, gets sick
+    (state-satisfied 'add-transition! (fsm-transition (lambda () (and food-offered (rebels?))) state-refused))
     (state-satisfied 'add-transition! (fsm-transition true-condition? state-satisfied))
     ;;---
-    (state-hungry 'add-transition! (fsm-transition (λ () (and food-offered (not (rebels?)))) state-eating))
-    (state-hungry 'add-transition! (fsm-transition (λ () (and food-offered (rebels?))) state-refused))
-    (state-hungry 'add-transition! (fsm-transition (λ () (hunger-level 'low?)) state-satisfied))
-    (state-hungry 'add-transition! (fsm-transition (λ () (hunger-level 'deadly?)) state-dead))
+    (state-hungry 'add-transition! (fsm-transition (lambda () (and food-offered (not (rebels?)))) state-eating))
+    (state-hungry 'add-transition! (fsm-transition (lambda () (and food-offered (rebels?))) state-refused))
+    (state-hungry 'add-transition! (fsm-transition (lambda () (hunger-level 'low?)) state-satisfied))
+    (state-hungry 'add-transition! (fsm-transition (lambda () (hunger-level 'deadly?)) state-dead))
     (state-hungry 'add-transition! (fsm-transition true-condition? state-hungry))
     ;;---
-    (state-eating 'add-transition! (fsm-transition (λ () (hunger-level 'low?)) state-satisfied))
-    (state-eating 'add-transition! (fsm-transition (λ () (hunger-level 'high?)) state-hungry))
+    (state-eating 'add-transition! (fsm-transition (lambda () (hunger-level 'low?)) state-satisfied))
+    (state-eating 'add-transition! (fsm-transition (lambda () (hunger-level 'high?)) state-hungry))
     ;;---
     (state-refused 'add-transition! (fsm-transition true-condition? state-hungry)))
 
     
-  (define state-satisfied (fsm-state (λ () (hunger-level 'raise!)) '() 4))
-  (define state-hungry (fsm-state (λ () (hunger-level 'raise!)) '() 5))
+  (define state-satisfied (fsm-state (lambda () (hunger-level 'raise!)) '() 4))
+  (define state-hungry (fsm-state (lambda () (hunger-level 'raise!)) '() 5))
   (define state-eating (fsm-state eat-the-food! '() 2))
   (define state-refused (fsm-state reject-the-food! '() 1))
   (define state-dead (fsm-state '() '() 0))

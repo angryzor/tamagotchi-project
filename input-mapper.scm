@@ -1,19 +1,25 @@
-(load "input-binding.scm")
+(load "input-context.scm")
+(load "stack.scm")
 
 (define (input-mapper)
-  (define mappings '()) ;; Using an ordinary list here. Could be changed later
+  (define contexts (stack))
   
-  (define (map input proc)
-    (set! mappings (cons (input-binding input proc) mappings)))
+  (define (push-context! ctxt)
+    (contexts 'push! ctxt))
+  
+  (define (pop-context!)
+    (if (contexts 'empty?)
+        (error 'input-mapper-object "context stack is empty!")
+        (contexts 'pop!)))
   
   (define (check)
-    (for-each (λ (x)
-                (x 'check)) mappings))
+    ((contexts 'top) 'check))
   
   (define (input-mapper-object msg . args)
     (let ((my-param (make-param args 'input-mapper-object)))
       (case msg
-        ('map (map (my-param 1) (my-param 2)))
+        ('push-context! (push-context! (my-param 1)))
+        ('pop-context! (pop-context!))
         ('check (check))
         (else (error 'input-mapper-object "message \"~S\" unknown" msg)))))
   

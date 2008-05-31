@@ -1,0 +1,13 @@
+(define bootseq '())
+
+(define (load-boot)
+  (let ((f (open-output-file "boot")))
+    (define (load-iter res)
+      (let ((t (read f)))
+        (if (eof-object? t)
+            (set! bootseq (reverse res))
+            (load-iter (cons t res)))))
+    (if (not (zero? f))
+        (begin
+          (load-iter '())
+          (close-output-port f)))))

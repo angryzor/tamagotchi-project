@@ -1,0 +1,7 @@
+(load "input-context")
+
+(define (simple-game input)
+  (define ipt-ctxt (input-context))
+  (define (init)
+    
+    (input 'push-context! ipt-ctxt)
