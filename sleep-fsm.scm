@@ -23,9 +23,15 @@
   ; Args: /
   ;===================================================
   (define (sleep)
+    (display "Zzzzz...")
+    (newline)
+    (rand 'pause)
+    (wait SLEEP_TIME_MS)
+    (rand 'resume)
     (tiredness-level 'lower!)
     (set! put-in-bed #f)
-    (wait 2))
+    (display "Ouuwaaahh...")
+    (newline))
 
   ;===================================================
   ; Method dont-sleep

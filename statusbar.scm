@@ -10,10 +10,10 @@
         (logior (ash red 5) (ash green 2))))
     
     
-;    (levels 'for-each-counting (lambda (level i)
-;                                 (fill-rectangle (+ (* 21 i) 3) 3 18 18 (convert-to-RGB332 (level 'percent))))))
     (levels 'for-each-counting (lambda (level i)
-                                 (fill-rectangle (+ (* 21 i) 10) 10 4 4 (convert-to-RGB332 (level 'percent))))))
+                                 (fill-rectangle (+ (* 21 i) 3) 3 18 18 (convert-to-RGB332 (level 'percent))))))
+;    (levels 'for-each-counting (lambda (level i)
+;                                 (fill-rectangle (+ (* 21 i) 10) 10 4 4 (convert-to-RGB332 (level 'percent))))))
   
   (define (totalredraw)
     (draw-string "hgr" 3 23)

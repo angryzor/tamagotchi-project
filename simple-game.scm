@@ -24,14 +24,16 @@
   
   (define (correct-pin)
     (case rval
-      ('(0) (pin 10))
-      ('(1) (pin 9))
-      ('(2) (pin 8))
-      ('(3) (pin 7))))
+      ('(0) (pin 15))
+      ('(1) (pin 14))
+      ('(2) (pin 13))
+      ('(3) (pin 12))))
   
   (define (blink-correct-pin ms)
     (set-pin (correct-pin))
+    (rand 'pause)
     (wait ms)
+    (rand 'resume)
     (clear-pin (correct-pin)))
   
   (define (check-if-won)

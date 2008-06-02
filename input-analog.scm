@@ -2,7 +2,7 @@
 
 (define (input-analog adc-in-id trigger-proc)
   (define (this-init)
-    'ok) ;; init PINSEL reg?
+    'ok)
   
   (define (this-check)
     (trigger-proc (round (* 100 (measure adc-in-id)))))

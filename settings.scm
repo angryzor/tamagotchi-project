@@ -11,8 +11,7 @@
 ;------------
 
 ; Time for the creature to be asleep.
-; NOTE: Change to wake up when light falls in
-(define SLEEP_TIME_SECONDS 30)
+(define SLEEP_TIME_MS 12000)
 
 
 

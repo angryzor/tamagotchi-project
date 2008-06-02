@@ -57,6 +57,14 @@
   (define (transition-all-fsms)
     (fsm-bundle 'transition))
   
+  (define (prepare-pins)
+    (output-pin (pin 12))
+    (output-pin (pin 13))
+    (output-pin (pin 14))
+    (output-pin (pin 15))
+    (output-pin (pin 19))
+    (set-pin (pin 19)))
+    
   
   (define (mainloop)
     (if (fsm-bundle 'one-dead?)
@@ -72,7 +80,6 @@
           (beep-if-necessary)
           (mainloop))))
   (init-input)
-  (output-pin (pin 19))
-  (set-pin (pin 19))
+  (prepare-pins)
   (mainloop)
   )

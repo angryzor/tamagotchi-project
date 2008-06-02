@@ -1,4 +1,5 @@
-
+(define (send-byte a b)
+  'ok)
 
 ;;;; Boot File, only execute this code once per memory flash
 
@@ -202,25 +203,6 @@
 (define colour-red #xe0)
 (define colour-green #x1C)
 (define colour-blue 3)
-
-(define (send-bit bit)
-  (clear-pin sclk)
-  (if (eq? bit 0)
-      (clear-pin sdata)
-      (set-pin sdata))
-  (set-pin sclk))
-
-(define (send-byte cmd data)
-  (clear-pin cs)
-  ;; send the command bit
-  (send-bit cmd)
-  ;; send the byte
-  (let loop ((bitnr 7))
-    (if (>= bitnr 0)
-        (begin
-          (send-bit (get-bit data bitnr))
-          (loop (- bitnr 1)))))
-  (set-pin cs))
 
 ;;;; LCD's Serial Protocol Interface
 

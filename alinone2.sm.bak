@@ -1,0 +1,5 @@
+(erase)
+
+(define of (open-output-file "boot"))
+
+(write '(begin
