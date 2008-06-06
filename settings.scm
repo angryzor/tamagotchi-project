@@ -11,7 +11,7 @@
 ;------------
 
 ; Time for the creature to be asleep.
-(define SLEEP_TIME_MS 12000)
+(define SLEEP_TIME 3)
 
 
 

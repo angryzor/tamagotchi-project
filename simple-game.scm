@@ -24,10 +24,10 @@
   
   (define (correct-pin)
     (case rval
-      ('(0) (pin 15))
-      ('(1) (pin 14))
-      ('(2) (pin 13))
-      ('(3) (pin 12))))
+      ((0) (pin 15))
+      ((1) (pin 14))
+      ((2) (pin 13))
+      ((3) (pin 12))))
   
   (define (blink-correct-pin ms)
     (set-pin (correct-pin))
@@ -49,9 +49,12 @@
       (set! buttons-pressed 0)
       (set! rval (rand 'get 0 3)))
     (define (inputloop)
+      (display "Simple game checking for input...")
       (if (not (and (input 'check)
                     (= buttons-pressed 1)))
-          (inputloop)))
+          (begin
+            (set-values!)
+            (inputloop))))
     
     (input 'push-context! ipt-ctxt)
     (set-values!)

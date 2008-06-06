@@ -15,6 +15,7 @@
 (define (sleep-fsm external)
   (define tiredness-level (need-level))
   (define put-in-bed #f)
+  (define cycles-to-go SLEEP_TIME)
   
   ;===================================================
   ; Method sleep
@@ -23,15 +24,8 @@
   ; Args: /
   ;===================================================
   (define (sleep)
-    (display "Zzzzz...")
-    (newline)
-    (rand 'pause)
-    (wait SLEEP_TIME_MS)
-    (rand 'resume)
-    (tiredness-level 'lower!)
-    (set! put-in-bed #f)
-    (display "Ouuwaaahh...")
-    (newline))
+    (tiredness-level 'lower-a-bit!)
+    (set! put-in-bed #f))
 
   ;===================================================
   ; Method dont-sleep
@@ -68,26 +62,28 @@
   ;===================================================
   (define (init-transitions)
     (state-awake 'add-transition! (fsm-transition (lambda () (tiredness-level 'high?)) state-tired))
-    (state-awake 'add-transition! (fsm-transition (lambda () (and put-in-bed (not (rebels?)))) state-asleep))
+    (state-awake 'add-transition! (fsm-transition (lambda () (and put-in-bed (not (rebels?)))) state-asleep (lambda () (set! cycles-to-go SLEEP_TIME))))
     (state-awake 'add-transition! (fsm-transition (lambda () (and put-in-bed (rebels?))) state-refused))
     (state-awake 'add-transition! (fsm-transition true-condition? state-awake))
     ;;---
-    (state-tired 'add-transition! (fsm-transition (lambda () (and put-in-bed (not (rebels?)))) state-asleep))
+    (state-tired 'add-transition! (fsm-transition (lambda () (and put-in-bed (not (rebels?)))) state-asleep (lambda () (set! cycles-to-go SLEEP_TIME))))
     (state-tired 'add-transition! (fsm-transition (lambda () (and put-in-bed (rebels?))) state-refused))
     (state-tired 'add-transition! (fsm-transition (lambda () (tiredness-level 'low?)) state-awake))
     (state-tired 'add-transition! (fsm-transition (lambda () (tiredness-level 'deadly?)) state-dead))
     (state-tired 'add-transition! (fsm-transition true-condition? state-tired))
     ;;---
+    (state-asleep 'add-transition! (fsm-transition (lambda () (> cycles-to-go 0)) state-asleep))
     (state-asleep 'add-transition! (fsm-transition (lambda () (tiredness-level 'low?)) state-awake))
     (state-asleep 'add-transition! (fsm-transition (lambda () (tiredness-level 'high?)) state-tired))
     ;;---
-    (state-refused 'add-transition! (fsm-transition true-condition? state-tired)))
+    (state-refused 'add-transition! (fsm-transition (lambda () (tiredness-level 'low?)) state-awake))
+    (state-refused 'add-transition! (fsm-transition (lambda () (tiredness-level 'high?)) state-tired)))
 
 
   (define state-awake (fsm-state (lambda () (tiredness-level 'raise!)) '() 4))
   (define state-tired (fsm-state (lambda () (tiredness-level 'raise!)) '() 5))
-  (define state-asleep (fsm-state sleep '() 2))
-  (define state-refused (fsm-state dont-sleep '() 1))
+  (define state-asleep (fsm-state sleep '() 3))
+  (define state-refused (fsm-state dont-sleep '() 2))
   (define state-dead (fsm-state '() '() 0))
   
   (define my-fsm (fsm state-awake))
@@ -97,10 +93,11 @@
       (case msg
         ('tired? (eq? (my-fsm 'get-current-state) state-tired))
         ('awake? (eq? (my-fsm 'get-current-state) state-awake))
-        ('sleeping? (eq? (my-fsm 'get-current-state) state-sleeping))
+        ('asleep? (eq? (my-fsm 'get-current-state) state-asleep))
         ('refused? (eq? (my-fsm 'get-current-state) state-refused))
         ('dead? (eq? (my-fsm 'get-current-state) state-dead))
         ('put-in-bed (set! put-in-bed #t))
+        ('wake (set! cycles-to-go 0))
         ('level tiredness-level)
         (else (apply my-fsm msg args)))))
   

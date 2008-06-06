@@ -1,22 +1,4 @@
-;(define (tone freq)
-;  (round (/ 1000000
-;            freq)))
-
 (define (buzzer port mpin)
-  ;  (define blinkbool #t)
-  ;  (define (blinkcb)
-  ;    (if blinkbool
-  ;        (set-pin GPIO_0 pin)
-  ;        (clear-pin GPIO_0 pin))
-  ;    (set! blinkbool (not blinkbool)))
-  ;  
-  ;  
-  ;  (define (playtone timer tone)
-  ;    (setup-timer tone)
-  ;    (start-timer)
-  ;    (wait-us (round len))
-  ;    (stop-timer))
-  
   (define (init)
     (output-pin (pin mpin)))
   

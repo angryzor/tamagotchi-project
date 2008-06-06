@@ -35,7 +35,7 @@
   (define (rebels?)
     (if (eq? (my-fsm 'get-current-state) state-rebellish)
         #t
-        (< (rand 'get 0 100) 10)))
+        (< (rand 'get 0 100) 20)))
 
   ;===================================================
   ; Method true-condition?

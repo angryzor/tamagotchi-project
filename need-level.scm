@@ -33,6 +33,15 @@
     (set! level (clamp (- level 30) 0 100)))
   
   ;===================================================
+  ; Method lower!
+  ; Spec: (  -> { #<void> } )
+  ; Desc: lowers the level
+  ; Args: /
+  ;===================================================
+  (define (lower-a-bit!)
+    (set! level (clamp (- level 5) 0 100)))
+  
+  ;===================================================
   ; Method high?
   ; Spec: (  -> { #<void> } )
   ; Desc: returns true if the level is above or equal to 75
@@ -73,6 +82,7 @@
       (case msg
         ('raise! (raise!))
         ('lower! (lower!))
+        ('lower-a-bit! (lower-a-bit!))
         ('high? (high?))
         ('low? (low?))
         ('critical? (critical?))

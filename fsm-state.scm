@@ -31,7 +31,7 @@
   
   ;=================================================
   ; Method next-state
-  ; Spec: (  -> fsm-state )
+  ; Spec: (  -> fsm-state U { #f } )
   ; Desc: "check"'s all transitions and returns the first non-#f value returned.
   ;       Returns #f if all of the transitions return #f.
   ;       The FSM should stay in its current state in this case.

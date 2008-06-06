@@ -33,4 +33,4 @@
 (define (measure o)
   (case o
     ('ain0 0)
-    ('ain1 0.9)))
+    ('ain1 0.91)))

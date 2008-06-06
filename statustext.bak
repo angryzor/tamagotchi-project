@@ -1,0 +1,16 @@
+(define (statustext bundle drawer)
+  (define (drawsleep)
+    (if (bundle 'send-to 'sleep 'asleep?)
+        (drawer 'write-string "zzzzz" 0 100)))
+  
+  (define (update)
+    (drawer 'fill-rectangle 0 100 128 6 color-white)
+    (drawsleep))
+  
+  (define (statustext-object msg . args)
+    (let ((my-param (make-param args 'statustext-object)))
+      (case msg
+        ('update (update))
+        (else (error 'statustext-object "message \"~S\" unknown" msg)))))
+  
+  statustext-object)

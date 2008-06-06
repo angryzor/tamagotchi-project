@@ -81,13 +81,14 @@
     (state-playing-game 'add-transition! (fsm-transition (lambda () (unhappiness-level 'low?)) state-happy))
     (state-playing-game 'add-transition! (fsm-transition (lambda () (unhappiness-level 'high?)) state-unhappy))
     ;;---
-    (state-refused 'add-transition! (fsm-transition true-condition? state-unhappy)))
+    (state-refused 'add-transition! (fsm-transition (lambda () (unhappiness-level 'low?)) state-happy))
+    (state-refused 'add-transition! (fsm-transition (lambda () (unhappiness-level 'high?)) state-unhappy)))
 
   (define state-happy (fsm-state (lambda () (unhappiness-level 'raise!)) '() 4))
   (define state-unhappy (fsm-state (lambda () (unhappiness-level 'raise!)) '() 5))
   (define state-playing-game (fsm-state play-a-game '() 2))
-  (define state-refused (fsm-state reject-a-game '() 1))
-  (define state-dead (fsm-state '() '() 0))    ; suicide? :S
+  (define state-refused (fsm-state reject-a-game '() 2))
+  (define state-dead (fsm-state '() '() 0))
   
   (define my-fsm (fsm state-happy))
   

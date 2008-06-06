@@ -74,9 +74,9 @@
         (exit-action)))
   
   (define (fsm-state-object msg . args)
-    (let ((my-param (make-param 'fsm-state-object)))
+    (let ((my-param (make-param args 'fsm-state-object)))
       (case msg
-        ('add-transition! (add-transition! (my-param args 1)))
+        ('add-transition! (add-transition! (my-param 1)))
         ('next-state (next-state))
         ('enter (enter))
         ('leave (leave))

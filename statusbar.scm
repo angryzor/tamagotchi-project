@@ -1,4 +1,4 @@
-(define (statusbar levels fill-rectangle draw-string)
+(define (statusbar levels drawer)
   
   (define (update)
     (define (convert-to-RGB332 pct)
@@ -11,17 +11,15 @@
     
     
     (levels 'for-each-counting (lambda (level i)
-                                 (fill-rectangle (+ (* 21 i) 3) 3 18 18 (convert-to-RGB332 (level 'percent))))))
-;    (levels 'for-each-counting (lambda (level i)
-;                                 (fill-rectangle (+ (* 21 i) 10) 10 4 4 (convert-to-RGB332 (level 'percent))))))
+                                 (drawer 'fill-rectangle (+ (* 21 i) 3) 3 18 18 (convert-to-RGB332 (level 'percent))))))
   
   (define (totalredraw)
-    (draw-string "hgr" 3 23)
-    (draw-string "slp" 24 23)
-    (draw-string "gem" 45 23)
-    (draw-string "reb" 66 23)
-    (draw-string "gez" 87 23)
-    (draw-string "uit" 108 23)
+    (drawer 'write-string "hgr" 3 23)
+    (drawer 'write-string "slp" 24 23)
+    (drawer 'write-string "gem" 45 23)
+    (drawer 'write-string "reb" 66 23)
+    (drawer 'write-string "gez" 87 23)
+    (drawer 'write-string "uit" 108 23)
     (update))
   
   (define (statusbar-object msg . args)
@@ -32,3 +30,7 @@
         (else (error 'statusbar-object "message \"~S\" unknown" msg)))))
   
   statusbar-object)
+
+
+;    (levels 'for-each-counting (lambda (level i)
+;                                 (fill-rectangle (+ (* 21 i) 10) 10 4 4 (convert-to-RGB332 (level 'percent))))))

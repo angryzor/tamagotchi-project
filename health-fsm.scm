@@ -74,13 +74,14 @@
     (state-healing 'add-transition! (fsm-transition (lambda () (sickness-level 'low?)) state-healthy))
     (state-healing 'add-transition! (fsm-transition (lambda () (sickness-level 'high?)) state-sick))
     ;;---
-    (state-refused 'add-transition! (fsm-transition true-condition? state-sick)))
+    (state-refused 'add-transition! (fsm-transition (lambda () (sickness-level 'low?)) state-healthy))
+    (state-refused 'add-transition! (fsm-transition (lambda () (sickness-level 'high?)) state-sick)))
 
 
   (define state-healthy (fsm-state '() '() 4))
   (define state-sick (fsm-state '() '() 5))
   (define state-healing (fsm-state heal '() 2))
-  (define state-refused (fsm-state refuse-medicine '() 1))
+  (define state-refused (fsm-state refuse-medicine '() 2))
   (define state-dead (fsm-state '() '() 0))
   
   (define my-fsm (fsm state-healthy))
