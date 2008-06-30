@@ -25,6 +25,7 @@
   ;===================================================
   (define (sleep)
     (tiredness-level 'lower-a-bit!)
+    (set! cycles-to-go (- cycles-to-go 1))
     (set! put-in-bed #f))
 
   ;===================================================

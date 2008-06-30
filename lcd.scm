@@ -1,6 +1,7 @@
 (load "globloader.scm")
 (load "statusbar.scm")
 (load "statustext.scm")
+(load "bitmap-tamagotchi")
 (load "ld-lcd-drawer.scm")
 
 (define (lcd bundle)
@@ -10,6 +11,7 @@
   
   (define (init)
     (drawer 'fill-rectangle 0 0 128 128 colour-white)
+    (drawer 'draw-bitmap bitmap-tamagotchi 35 30 60 60)
     (sbar 'totalredraw)
     (stext 'update))
   

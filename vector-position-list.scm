@@ -35,7 +35,7 @@
   (define (checkpos pos)
     (if (or (< pos 0)
             (>= pos ptr)) ; Also incorporates empty check
-        (error vector-position-list.checkpos "invalid position")))
+        (error 'vector-position-list.checkpos "invalid position")))
   
   (define (storage-move-left src len dest)
     (if (> len 0)
@@ -271,7 +271,7 @@
         (else (error 'vector-position-list "message not understood: ~S" msg)))))
   
   (if (not (null? lst))
-    (from-scheme-list (car lst)))
+      (from-scheme-list (car lst)))
   
   vector-position-list-object)
 

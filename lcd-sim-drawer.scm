@@ -53,6 +53,30 @@
                                (+ y 1)
                                y) (cdr cmap))))))))
   
+  (define (draw-bitmap vec x y width height)
+    (define bitnum 0)
+    (define cursor 0)
+    
+    (define (next-colour)
+      (let ((res (logand (ash (vector-ref vec cursor) (- (* (- 2 bitnum) 8)))
+                         #xFF)))
+        (set! bitnum (remainder (+ bitnum 1) 3))
+        (if (= bitnum 0)
+            (set! cursor (+ cursor 1)))
+        res))
+    
+    (let ((x1 x)
+          (x2 (+ x width -1))
+          (y1 (+ y 2))
+          (y2 (+ y height 1)))
+      (let loop ((x 0)
+                 (y 0))
+        ((draw-pixel vp) (make-posn (+ x1 x) (+ y1 y)) (RGB332->rgb (next-colour)))
+        (let ((newx (modulo (+ x 1) (- x2 x1 -1))))
+                (if (not (= cursor (vector-length vec)))
+                    (loop newx (if (= newx 0)
+                                   (+ y 1)
+                                   y)))))))
   
   ;; OBJECT TABLE
   
@@ -61,6 +85,7 @@
       (case msg
         ('fill-rectangle (fill-rectangle (my-param 1) (my-param 2) (my-param 3) (my-param 4) (my-param 5)))
         ('write-string (write-string (my-param 1) (my-param 2) (my-param 3)))
+        ('draw-bitmap (draw-bitmap (my-param 1) (my-param 2) (my-param 3) (my-param 4) (my-param 5)))
         (else (error 'lcd-drawer-object "message \"~S\" unknown" msg)))))
   
   

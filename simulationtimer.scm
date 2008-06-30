@@ -30,7 +30,11 @@
       (/ (- timatstop timatreset)
          timpr)))
 
+(define lighttogo 0.91)
+
 (define (measure o)
   (case o
     ('ain0 0)
-    ('ain1 0.91)))
+    ('ain1 (let ((lnow lighttogo))
+             (set! lighttogo 0.5)
+             lnow))))

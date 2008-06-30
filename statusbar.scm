@@ -32,5 +32,3 @@
   statusbar-object)
 
 
-;    (levels 'for-each-counting (lambda (level i)
-;                                 (fill-rectangle (+ (* 21 i) 10) 10 4 4 (convert-to-RGB332 (level 'percent))))))
